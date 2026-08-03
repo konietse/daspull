@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo.png" alt="DASPull logo" width="200">
+  <img src="https://raw.githubusercontent.com/konietse/daspull/main/docs/logo.png" alt="DASPull logo" width="200">
 </p>
 
 <h1 align="center">DASPull</h1>
