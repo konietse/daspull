@@ -1,0 +1,58 @@
+schema_version: 1
+id: lafarge
+name: LaFarge-Conco Mine
+provenance:
+  doi: https://doi.org/10.7914/SN/5S_2017
+location:
+  latitude: 41.8034
+  longitude: -88.3204
+acquisition:
+  interrogator:
+    manufacturer: Silixa
+    model: iDAS
+  start_date: '2017-07-27'
+  end_date: '2017-07-28'
+  duration_days: 2
+  sampling_rate_hz: 1000
+  gauge_length_m: 10
+  channel_spacing_m: 1
+  cable_length_m: 1120
+  number_of_channels: 1120
+  measurement: strain_rate
+data:
+  format: SEG-Y
+  size_gb: 23.673
+  catalog_observed_at: 2026-07-27
+  downsampled: false
+access:
+  type: globus_https
+  collection_id: 706e304c-5def-11ec-9b5c-f9dfb1abb183
+  root_path: /LaFargeConcoMine/
+layout:
+  summary: Underground mine array, North Aurora, Illinois
+  primary_root: /LaFargeConcoMine/Data/
+  primary_pattern: '*.sgy'
+  blocks:
+  - pattern: '_(\d{12})\.sgy$'
+    timestamp_format: '%y%m%d%H%M%S'
+    duration_from_segy_size:
+      file_header_bytes: 3600      # 3200-byte EBCDIC textual + 400-byte binary
+      trace_header_bytes: 240
+      sample_bytes: 4              # IEEE float32
+      channels: 1120
+      sample_interval_ms: 1        # 1 kHz sampling rate
+domain:
+  environment: underground
+  source_type: active
+  applications:
+  - mine_seismic_monitoring
+  - blast_monitoring
+  - controlled_source_imaging
+  - near_surface_characterization
+quality:
+  channel_coordinates: partial
+  known_issues:
+  - Only a 2-day active-source field trial (blasts, hammer tap tests, ESS weight-drop tests). No continuous passive recording is included.
+  - Background noise from mine truck traffic/conveyor belts is present except when the mine was cleared for blasting.
+  - Channel coordinates come from tap tests at lettered stations plus a total station survey, not a per-channel calibration of the full cable.
+  - SEG-Y block duration varies by run (most files are 30 s at 1 kHz, but Blast 1 files are 60 s), so duration is derived from file size rather than assumed constant.

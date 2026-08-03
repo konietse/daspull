@@ -1,0 +1,58 @@
+schema_version: 1
+id: mars
+name: MARS
+provenance:
+  doi: https://doi.org/10.1785/0220230047
+location:
+  latitude: 36.873
+  longitude: -121.984
+acquisition:
+  interrogator:
+    manufacturer: OptaSense
+    model: QuantX
+  start_date: '2022-07-30'
+  end_date: '2024-12-17'
+  duration_days: 872
+  sampling_rate_hz: 200
+  gauge_length_m: 20.4
+  channel_spacing_m: 5.2
+  cable_length_m: 14794
+  number_of_channels: 2845
+  measurement: strain_rate
+data:
+  format: HDF5
+  size_gb: 4.507
+  catalog_observed_at: '2026-07-29'
+  downsampled: false
+access:
+  type: huggingface_https
+  base_url: https://huggingface.co
+  repo_id: AI4EPS/quakeflow_das
+  revision: main
+  prefix: monterey_bay/data/
+  root_path: /MARS/
+layout:
+  summary: Submarine MARS cable array (SeaFOAM), Monterey Bay, California
+  primary_root: /MARS/
+  primary_pattern: '*.h5'
+  blocks:
+  - pattern: '^(\d{8}T\d{6})Z\.h5$'
+    timestamp_format: '%Y%m%dT%H%M%S'
+    duration_seconds: 60
+domain:
+  environment: offshore
+  source_type: passive
+  applications:
+  - earthquake_detection
+  - earthquake_early_warning
+  - machine_learning_training
+  - ocean_bottom_seismology
+quality:
+  channel_coordinates: none
+  known_issues:
+  - Not the year-long SeaFOAM archive 33 individual 60 s ML-excerpt windows (2022-07 to 2024-12). Time-range selection only ever matches inside them.
+  - All 33 files cover only the inshore 2,845 channels of the full 52 km/ 10,245-channel SeaFOAM array. `number_of_channels`/`cable_length_m` here describe just this subset (2,845 x 5.2 m = 14,794 m).
+  - Channel spacing (5.2 m) is each file's own `dx_m`. The SeaFOAM paper reports 5.1 m. Gauge length (20.4 m) is from the paper; files' `event_id` round it to "GL20m".
+  - All 33 files have an empty `event_time` and `event_time_index` of -1, so despite the event-format repo they aren't centred on a catalogued earthquake. Magnitude/location-based selection isn't possible here.
+  - Files' `event_id` names two configs ("...GL20m..." vs "...F8_STU_GL20m..."), but recorded geometry is identical in all 33.
+  - Repo is a mutable git branch (`main`); file count/size can change under it. Pin a commit SHA for a reproducible catalog.

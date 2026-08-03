@@ -1,0 +1,54 @@
+schema_version: 1
+id: fossa
+name: FOSSA
+provenance:
+  doi: https://doi.org/10.1038/s41598-018-36675-8
+location:
+  latitude: 38.638
+  longitude: -121.590
+acquisition:
+  interrogator:
+    manufacturer: Silixa
+    model: iDAS-v2
+  start_date: '2017-09-06'
+  end_date: '2017-09-12'
+  duration_days: 7
+  sampling_rate_hz: 500
+  gauge_length_m: 10
+  channel_spacing_m: 2
+  cable_length_m: 23300
+  number_of_channels: 11648
+  measurement: strain_rate
+data:
+  format: TDMS
+  size_gb: 6123.664
+  catalog_observed_at: 2026-07-27
+  downsampled: false
+access:
+  type: globus_https
+  collection_id: 706e304c-5def-11ec-9b5c-f9dfb1abb183
+  root_path: /FOSSA/
+layout:
+  summary: Near-surface seismic array, Sacramento River, California
+  primary_root: /FOSSA/Data/
+  primary_pattern: '*.tdms'
+  blocks:
+  - pattern: 'westSac_(\d{12})\.tdms$'
+    timestamp_format: '%y%m%d%H%M%S'
+    duration_seconds: 60
+  # Every TDMS file sits directly in /FOSSA/Data/ with no date-based
+  # subdirectories, so there is nothing to prune a time range against.
+domain:
+  environment: onshore
+  source_type: passive
+  applications:
+  - earthquake_monitoring
+  - near_surface_characterization
+  - ambient_noise_interferometry
+  - aquifer_monitoring
+quality:
+  channel_coordinates: partial
+  known_issues:
+  - Channel geometry is from tap tests; less accurate toward the Woodland end of the cable, away from the West Sacramento interrogator.
+  - File timestamps can be off by up to a minute (no reliable GPS). Relative timing between files is accurate.
+  - Full deployment ran ~7 months (2017-07-28 to 2018-01-18). PubDAS curates only a one-week chunk (2017-09-06 to 09-12).

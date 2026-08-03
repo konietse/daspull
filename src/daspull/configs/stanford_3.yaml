@@ -1,0 +1,71 @@
+schema_version: 1
+id: stanford_3
+name: Stanford-3
+provenance:
+  doi: https://doi.org/10.1029/2019JB018656
+location:
+  latitude: 37.4250
+  longitude: -122.1790
+acquisition:
+  interrogator:
+    manufacturer: OptaSense
+    model: ODH4
+  start_date: '2017-10-06'
+  end_date: '2017-10-12'
+  duration_days: 6
+  cable_length_m: 2500
+  measurement: strain_rate
+  configurations:
+  - sampling_rate_hz: 50
+    channel_spacing_m: 8.16
+    gauge_length_m: 7.14
+    root: /Stanford-3-ODH4/Data/ODH4-2017-SEGY/SGY_Stanford_Permanent_DT37/
+  - sampling_rate_hz: 100
+    channel_spacing_m: 8.16
+    gauge_length_m: 7.14
+    root: /Stanford-3-ODH4/Data/ODH4-2017-SEGY/SGY_Stanford_Permanent_DT37_100Hz/
+  - sampling_rate_hz: 100
+    channel_spacing_m: 8.16
+    gauge_length_m: 2
+    root: /Stanford-3-ODH4/Data/ODH4-2017-SEGY/SGY_Stanford_Permanent_DT37_100_Hz_2m_gauge/
+  - sampling_rate_hz: 100
+    channel_spacing_m: 8.16
+    gauge_length_m: 7.14
+    root: /Stanford-3-ODH4/Data/ODH4-2017-SEGY/SGY_Stanford_Permanent_DT37_100Hz_Rec2/
+  - sampling_rate_hz: 100
+    channel_spacing_m: 8.16
+    gauge_length_m: 4
+    root: /Stanford-3-ODH4/Data/ODH4-2017-SEGY/SGY_Stanford_Permanent_DT37_100Hz_4m_Gauge/
+data:
+  format: SEG-Y
+  size_gb: 48.667
+  catalog_observed_at: 2026-07-27
+  downsampled: false
+access:
+  type: globus_https
+  collection_id: 706e304c-5def-11ec-9b5c-f9dfb1abb183
+  root_path: /Stanford-3-ODH4/
+layout:
+  summary: Dual-interrogator comparison array, Stanford, California
+  primary_root: /Stanford-3-ODH4/Data/ODH4-2017-SEGY/
+  primary_pattern: '*.sgy'
+  blocks:
+  - pattern: 'cbt_processed_(\d{8}_\d{6}\.\d{3})\+0000\.sgy$'
+    timestamp_format: '%Y%m%d_%H%M%S.%f'
+    duration_seconds: 300
+domain:
+  environment: onshore
+  source_type: passive
+  applications:
+  - instrument_comparison
+  - urban_seismic_monitoring
+  - ambient_noise_analysis
+quality:
+  channel_coordinates: partial
+  known_issues:
+  - Shares its geometry file with Stanford-1 (Stanford-1-Campus-geometry.csv), which geolocates only 620 of the cable's channels.
+  - Temporary dual-interrogator experiment (2017-10-05 to 10-13 per the PubDAS paper) on Stanford-1's cable loop. An existing OptaSense ODH-3 (published separately as Stanford-1) and a newly attached ODH-4 recorded concurrently for the first ~3 days, only the ODH-4 side is published here.
+  - The three "default gauge" runs have no numeric gauge length in the files (SEG-Y textual headers ship blank) or directory names. 7.14 m here is from the PubDAS paper (ODH-4 started "using acquisition parameters identical to the ODH-3," i.e. Stanford-1's gauge). Channel spacing (8.16 m) is constant across all five and also from the PubDAS paper, not the files.
+  - A separate 2500 Hz "Active Settings" run also happened per the operational log but isn't in this SEG-Y tree.
+  - ~2-3 h gaps exist between subdirectories where settings were switched.
+  - Dataset root also includes companion GM-network (AC06/AC07/AC08) miniSEED under Data/GM_ACs/, counted in the total size but not DAS data.

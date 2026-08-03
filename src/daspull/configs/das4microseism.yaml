@@ -1,0 +1,59 @@
+schema_version: 1
+id: das4microseism
+name: DAS4Microseism
+provenance:
+  doi: https://doi.org/10.18710/VPRD2H
+location:
+  latitude: 78.10
+  longitude: 13.40
+acquisition:
+  interrogator:
+    manufacturer: Alcatel Submarine Networks
+    model: OptoDAS
+  start_date: '2020-06-23'
+  end_date: '2020-08-04'
+  duration_days: 44
+  sampling_rate_hz: 50
+  gauge_length_m: 8.16
+  channel_spacing_m: 4.08
+  cable_length_m: 120000
+  number_of_channels: 30000
+  measurement: strain
+data:
+  format: MAT
+  size_gb: 195.614
+  catalog_observed_at: 2026-07-28
+  downsampled: true
+  original_sampling_rate_hz: 645.161
+access:
+  type: dataverse_https
+  base_url: https://dataverse.no
+  persistent_id: doi:10.18710/VPRD2H
+  root_path: /DAS4Microseism/
+layout:
+  summary: Ocean-bottom fiber-optic array, Isfjorden, Svalbard, Norway
+  primary_root: /DAS4Microseism/Data/
+  primary_pattern: '*.mat'
+  blocks:
+  - pattern: '(\d{8}_\d{6})_ch\d+_to_ch\d+_rsamp\d+ms_L300s_hourly_nogeom\.mat$'
+    timestamp_format: '%Y%m%d_%H%M%S'
+    duration_seconds: 300
+  - pattern: '(\d{8}_\d{6})_ch\d+_to_ch\d+_rsamp\d+ms_L1200s_nogeom\.mat$'
+    timestamp_format: '%Y%m%d_%H%M%S'
+    duration_seconds: 1200
+domain:
+  environment: offshore
+  source_type: passive
+  applications:
+  - ocean_dynamics_monitoring
+  - microseism_detection
+  - atmospheric_dynamics_monitoring
+  - storm_tracking
+quality:
+  channel_coordinates: partial
+  known_issues:
+  - Only a curated subset of the continuous 44-day deployment is published, not the full continuous recording. The published subset includes 520 hourly 5-minute (300 s) snapshots (2020-07-05 to 07-27, channels 1050-18000) plus four 20-minute (1200 s) example files (2020-07-22, channels 1-5000 in two splits).
+  - Resampled from ~1.55 ms (~645 Hz) to 20 ms (50 Hz, Nyquist 25 Hz) with an 80% antialiasing filter, and decimated from 1.02 m raw channel spacing to the published 4.08 m, to reduce file size.
+  - No exact fiber lat/lon is published (route is proprietary to Uninett AS). Each file gives along-cable distance from shore and water depth per channel instead.
+  - Files are MATLAB structs (`scipy.io.loadmat`) bundling data with channel/position/time metadata. No separate geometry file.
+  - The dataset's Jobs/ directory ships processing scripts, not DAS data. It sits outside primary_root and is never selected.

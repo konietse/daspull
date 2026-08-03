@@ -1,0 +1,54 @@
+schema_version: 1
+id: das4whale
+name: DAS4Whale
+provenance:
+  doi: https://doi.org/10.5281/zenodo.5823343
+location:
+  latitude: 78.10
+  longitude: 13.40
+acquisition:
+  interrogator:
+    manufacturer: Alcatel Submarine Networks
+    model: OptoDAS
+  start_date: '2020-06-27'
+  end_date: '2020-07-16'
+  duration_days: 20
+  sampling_rate_hz: 645.16
+  gauge_length_m: 8.16
+  channel_spacing_m: 4
+  cable_length_m: 120000
+  measurement: strain
+data:
+  format: MAT
+  size_gb: 37.625
+  catalog_observed_at: 2026-07-28
+  downsampled: false
+access:
+  type: zenodo_https
+  base_url: https://zenodo.org
+  record_id: '5823343'
+  root_path: /DAS4Whale/
+layout:
+  summary: Ocean-bottom fiber-optic array excerpts for baleen whale monitoring, Isfjorden, Svalbard, Norway
+  primary_root: /DAS4Whale/
+  primary_pattern: '*.mat'
+  blocks:
+  - pattern: '(\d{8}_\d{6})_ch\d+_to_ch\d+_whale_raw_L(\d+)s\.mat$'
+    timestamp_format: '%Y%m%d_%H%M%S'
+    duration_group: 2
+domain:
+  environment: offshore
+  source_type: passive
+  applications:
+  - marine_mammal_monitoring
+  - whale_call_detection
+  - bioacoustic_monitoring
+  - passive_acoustic_monitoring
+quality:
+  channel_coordinates: partial
+  known_issues:
+  - Shares the Svalbard OptoDAS array/cable with PubDAS's DAS4Microseism release, but publishes only 3 short excerpts around whale-call events, not a continuous deployment.
+  - The 3 windows (2020-06-27 05:24:41-05:27:21, 2020-06-27 19:22:55-19:28:05, 2020-07-16 15:43:02-15:55:02 UTC) are each split across files by channel range. Duration is per-file in the filename's L<seconds>s suffix (160/310/720 s), not constant.
+  - No exact fiber lat/lon is published (route is proprietary to Uninett AS). Each file gives channel number and along-cable distance from shore instead.
+  - Gauge length is recorded per file (`info_GL_m`) rather than one declared value. 8.16 m here is Bouffaut et al. (2022)'s stated design value for this array, not independently verified against each file's attribute.
+  - Files are MATLAB structs (`scipy.io.loadmat`) bundling data with channel/ position/time metadata; no separate geometry file.

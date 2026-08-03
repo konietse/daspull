@@ -1,0 +1,62 @@
+schema_version: 1
+id: porotomo_v
+name: PoroTomo DASV
+provenance:
+  doi: https://doi.org/10.15121/1778858
+location:
+  latitude: 39.8006
+  longitude: -119.0095
+acquisition:
+  interrogator:
+    manufacturer: Silixa
+    model: iDAS
+  start_date: '2016-03-17'
+  end_date: '2016-03-28'
+  duration_days: 12
+  sampling_rate_hz: 1000
+  gauge_length_m: 10
+  channel_spacing_m: 1.021
+  cable_length_m: 363
+  number_of_channels: 384
+  measurement: phase
+data:
+  format: HDF5
+  size_gb: 1056.55
+  catalog_observed_at: 2026-07-28
+  downsampled: false
+access:
+  type: s3_https
+  base_url: https://nrel-pds-porotomo.s3.amazonaws.com
+  prefix: DAS/H5-standardized/DASV/
+  root_path: /PoroTomo_V/
+layout:
+  summary: Vertical borehole fiber-optic array (DASV), Brady Hot Springs geothermal field, Nevada
+  primary_root: /PoroTomo_V/
+  primary_pattern: '*.h5'
+  blocks:
+  - pattern: 'PoroTomo_iDAS\d+_(\d{12})\.h5$'
+    timestamp_format: '%y%m%d%H%M%S'
+    duration_seconds: 30
+  directories:
+  - pattern: '^/PoroTomo_V/(\d{8})/$'
+    timestamp_format: '%Y%m%d'
+    span:
+      days: 1
+domain:
+  environment: borehole
+  source_type: passive
+  applications:
+  - geothermal_reservoir_monitoring
+  - seismic_tomography
+  - ambient_noise_interferometry
+  - microseismic_monitoring
+quality:
+  channel_coordinates: none
+  known_issues:
+  - Recording had interruptions during the deployment, similar to the horizontal array (see porotomo_h).
+  - This standardized HDF5 conversion only covers 2016-03-17 to 03-26 (10 days). The physical deployment ran through 03-28 (12 days) in the original SEG-Y. The last 2 days aren't available in this format.
+  - The 20160317/ folder holds only 2 files, both timestamped 2016-03-18. The real continuous 30 s cadence effectively begins in 20160318/, and 03-17 holds only setup/leftover files.
+  - Converted from the original SEG-Y via the GDR's "DAS Data Pipeline". A derived representation, not raw interrogator output.
+  - Filenames encode a bare local timestamp (yymmddHHMMSS) with no documented timezone. Treated as UTC (GPS-disciplined convention) but unverified against the underlying SEG-Y trace headers.
+  - Raw measurement is optical phase, not strain/strain-rate. The 363 m well length doesn't evenly divide by 1.021 m x 384 channels. Treat channel_spacing_m as nominal, not an exact fit for this short array.
+  - A separate, unrelated 2018 explosion-test dataset (GDR submission 1517) shares this S3 bucket under a sibling prefix and isn't part of this config.

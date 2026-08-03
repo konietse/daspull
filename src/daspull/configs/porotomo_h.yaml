@@ -1,0 +1,61 @@
+schema_version: 1
+id: porotomo_h
+name: PoroTomo DASH
+provenance:
+  doi: https://doi.org/10.15121/1778858
+location:
+  latitude: 39.8057
+  longitude: -119.0029
+acquisition:
+  interrogator:
+    manufacturer: Silixa
+    model: iDAS
+  start_date: '2016-03-08'
+  end_date: '2016-03-26'
+  duration_days: 19
+  sampling_rate_hz: 1000
+  gauge_length_m: 10
+  channel_spacing_m: 1.021
+  cable_length_m: 8904.14
+  number_of_channels: 8721
+  measurement: phase
+data:
+  format: HDF5
+  size_gb: 42753.473
+  catalog_observed_at: 2026-07-28
+  downsampled: false
+access:
+  type: s3_https
+  base_url: https://nrel-pds-porotomo.s3.amazonaws.com
+  prefix: DAS/H5-standardized/DASH/
+  root_path: /PoroTomo_H/
+layout:
+  summary: Horizontal trenched fiber-optic array (DASH), Brady Hot Springs geothermal field, Nevada
+  primary_root: /PoroTomo_H/
+  primary_pattern: '*.h5'
+  blocks:
+  - pattern: 'PoroTomo_iDAS\d+_(\d{12})\.h5$'
+    timestamp_format: '%y%m%d%H%M%S'
+    duration_seconds: 30
+  directories:
+  - pattern: '^/PoroTomo_H/(\d{8})/$'
+    timestamp_format: '%Y%m%d'
+    span:
+      days: 1
+domain:
+  environment: onshore
+  source_type: passive
+  applications:
+  - geothermal_reservoir_monitoring
+  - seismic_tomography
+  - ambient_noise_interferometry
+  - microseismic_monitoring
+quality:
+  channel_coordinates: none
+  known_issues:
+  - Recording had interruptions during the deployment. Daily file counts range from 123 to 2880 (a full day at 30 s/file), see the bucket's own DASH_file_count.txt manifest at the S3 bucket root.
+  - Converted from the original SEG-Y via the GDR's "DAS Data Pipeline", a derived representation, not raw interrogator output.
+  - Filenames encode a bare local timestamp (yymmddHHMMSS) with no documented timezone. Treated as UTC (GPS-disciplined convention) but unverified against the underlying SEG-Y trace headers.
+  - Raw measurement is optical phase, not strain/strain-rate.
+  - A separate, unrelated 2018 explosion-test dataset (GDR submission 1517) shares this S3 bucket under a sibling "DASH_NV-test-site-explosion_standardized/" prefix and isn't part of this config.
+  - This bucket's raw-HDF5 tree (DAS/H5/DASH/, unused here) stores each 30 s block twice. Once individually, once in a daily merged file. Roughly doubling its footprint versus this standardized representation.

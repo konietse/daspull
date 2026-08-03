@@ -1,0 +1,58 @@
+schema_version: 1
+id: valencia
+name: Valencia
+provenance:
+  doi: https://doi.org/10.7914/SN/ZH_2020
+location:
+  latitude: 39.470
+  longitude: -0.150
+acquisition:
+  interrogator:
+    manufacturer: Febus Optics
+    model: A1-R
+  start_date: '2020-09-01'
+  end_date: '2020-09-15'
+  duration_days: 15
+  sampling_rate_hz: 250
+  gauge_length_m: 30.4
+  channel_spacing_m: 16.8
+  cable_length_m: 50000
+  number_of_channels: 2977
+  measurement: strain_rate
+data:
+  format: HDF5
+  size_gb: 1684.570
+  catalog_observed_at: 2026-07-27
+  downsampled: true
+  original_sampling_rate_hz: 1000
+access:
+  type: globus_https
+  collection_id: 706e304c-5def-11ec-9b5c-f9dfb1abb183
+  root_path: /Valencia/
+layout:
+  summary: Submarine telecom cable array, Valencia-Mallorca, Spain
+  primary_root: /Valencia/Data/
+  primary_pattern: '*.h5'
+  blocks:
+  - pattern: 'SR_Valencia_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})_UTC_10mins\.h5$'
+    timestamp_format: '%Y-%m-%d_%H-%M-%S'
+    duration_seconds: 600
+  directories:
+  - pattern: '^/Valencia/Data/SR_Valencia_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})_UTC/$'
+    timestamp_format: '%Y-%m-%d_%H-%M-%S'
+    span:
+      hours: 1
+domain:
+  environment: mixed
+  source_type: passive
+  applications:
+  - ocean_dynamics_monitoring
+  - microseism_detection
+  - earthquake_detection
+quality:
+  channel_coordinates: partial
+  known_issues:
+  - Downsampled on PubDAS from 1000 Hz to 250 Hz via a 10th-order Chebyshev type I low-pass filter (below 125 Hz) to reduce repository volume.
+  - Original hour-long interrogator files were truncated into six 10-minute HDF5 files each. Filenames encode each block's UTC start time.
+  - The readme and the PubDAS paper claim only 2020-09-01 to 09-07 is continuous/published (the second week allegedly unpublished due to gaps), but the live catalog actually contains hourly directories through ~2020-09-08 16:05 UTC plus one isolated 20-minute block on 09-15 07:36-07:56 UTC; treat data outside 09-01 to 09-07 as unverified/gappy.
+  - Only channels 510-2977 (submarine section) have precise per-channel coordinates (DAS-1-geometry-Valencia-undersea.csv). The on-land section (channels 1-509, first 9189 m) is documented only by a KMZ cable path.

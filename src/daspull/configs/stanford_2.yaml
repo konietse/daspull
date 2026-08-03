@@ -1,0 +1,58 @@
+schema_version: 1
+id: stanford_2
+name: Stanford-2
+provenance:
+  doi: https://doi.org/10.1029/2020GL089931
+location:
+  latitude: 37.4272
+  longitude: -122.1871
+acquisition:
+  interrogator:
+    manufacturer: OptaSense
+    model: ODH3
+  start_date: '2020-03-01'
+  end_date: '2020-03-14'
+  duration_days: 14
+  sampling_rate_hz: 250
+  gauge_length_m: 20
+  channel_spacing_m: 8.16
+  cable_length_m: 10200
+  number_of_channels: 1250
+  measurement: strain_rate
+data:
+  format: SEG-Y
+  size_gb: 1513.509
+  catalog_observed_at: 2026-07-27
+  downsampled: false
+access:
+  type: globus_https
+  collection_id: 706e304c-5def-11ec-9b5c-f9dfb1abb183
+  root_path: /Stanford-2-Sandhill-Road/
+layout:
+  summary: City-scale urban array, Palo Alto, California
+  primary_root: /Stanford-2-Sandhill-Road/Data/
+  primary_pattern: '*.sgy'
+  blocks:
+  - pattern: 'cbt_processed_(\d{8}_\d{6}\.\d{3})\+0000\.sgy$'
+    timestamp_format: '%Y%m%d_%H%M%S.%f'
+    duration_seconds: 60
+  directories:
+  - pattern: '^/Stanford-2-Sandhill-Road/Data/(\d{8})/$'
+    timestamp_format: '%Y%m%d'
+    span:
+      days: 1
+    pad_days: 1
+domain:
+  environment: onshore
+  source_type: passive
+  applications:
+  - urban_seismic_monitoring
+  - traffic_monitoring
+  - infrastructure_monitoring
+  - near_surface_characterization
+quality:
+  channel_coordinates: partial
+  known_issues:
+  - Only channels ~399-750 (Sandhill Road section) are tap-test calibrated. The shipped geometry file covers just that range though all 1250 channels are recorded. Quality is degraded outside that range.
+  - Daily subdirectories (Data/YYYYMMDD/) key to the local Pacific calendar day, not UTC, so each directory's files span ~06:58/05:58 UTC (PST/PDT) through the same clock time on the following UTC day.
+  - A handful of files per day are shorter than the standard 60 s block, consistent with small gaps at some day boundaries (e.g. 2020-03-02, 03-03, 03-06, 03-07, 03-09, 03-13, 03-14).

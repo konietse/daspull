@@ -1,0 +1,740 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://daspull.dev/schemas/das-dataset-v1.json",
+  "title": "DASPull dataset metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "provenance",
+    "location",
+    "acquisition",
+    "data",
+    "access",
+    "layout",
+    "domain",
+    "quality"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "doi"
+      ],
+      "properties": {
+        "doi": {
+          "type": "string",
+          "pattern": "^https://doi.org/"
+        }
+      }
+    },
+    "location": {
+      "description": "Approximate WGS84 coordinates of the array's geographic center -- e.g. the midpoint of a linear cable deployment, or the centroid of a grid/loop layout -- as reported in or derived from the array's own site figures in the deployment literature.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      }
+    },
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interrogator",
+        "duration_days",
+        "cable_length_m",
+        "measurement"
+      ],
+      "properties": {
+        "interrogator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "manufacturer",
+            "model"
+          ],
+          "properties": {
+            "manufacturer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "model": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "duration_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sampling_rate_hz": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gauge_length_m": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "channel_spacing_m": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "number_of_channels": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cable_length_m": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "measurement": {
+          "enum": [
+            "strain",
+            "strain_rate",
+            "phase",
+            "velocity"
+          ]
+        },
+        "configurations": {
+          "description": "Every set of acquisition settings this dataset recorded with, when they changed mid-deployment. Each entry must say which files used it (root and/or start/end). Declaring this replaces the single sampling_rate_hz/channel_spacing_m/gauge_length_m/number_of_channels values, and makes daspull require --sampling-rate/--channel-spacing/--gauge-length before it will select any files.",
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sampling_rate_hz",
+              "channel_spacing_m",
+              "gauge_length_m"
+            ],
+            "anyOf": [
+              {
+                "required": [
+                  "root"
+                ]
+              },
+              {
+                "required": [
+                  "start"
+                ]
+              },
+              {
+                "required": [
+                  "end"
+                ]
+              }
+            ],
+            "properties": {
+              "sampling_rate_hz": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "channel_spacing_m": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "gauge_length_m": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "number_of_channels": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "root": {
+                "description": "Subtree whose files were recorded with these settings, as an absolute dataset path with a trailing slash. Use this when each setting has its own directory.",
+                "type": "string",
+                "pattern": "^/.+/$"
+              },
+              "start": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}( \\d{2}:\\d{2}(:\\d{2})?)?$",
+                "description": "First UTC moment these settings were in effect, 'YYYY-MM-DD[ HH:MM[:SS]]'. A file is attributed by the start of the block its filename encodes. Omit for open-ended."
+              },
+              "end": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}( \\d{2}:\\d{2}(:\\d{2})?)?$",
+                "description": "First UTC moment these settings were no longer in effect (exclusive). Omit for open-ended."
+              }
+            }
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "sampling_rate_hz",
+            "channel_spacing_m",
+            "gauge_length_m"
+          ],
+          "properties": {
+            "configurations": false
+          }
+        },
+        {
+          "required": [
+            "configurations"
+          ],
+          "properties": {
+            "sampling_rate_hz": false,
+            "channel_spacing_m": false,
+            "gauge_length_m": false,
+            "number_of_channels": false
+          }
+        }
+      ]
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "size_gb",
+        "downsampled"
+      ],
+      "properties": {
+        "format": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size_gb": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "catalog_observed_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "downsampled": {
+          "type": "boolean"
+        },
+        "original_sampling_rate_hz": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "access": {
+      "description": "How the dataset's files are hosted and fetched. root_path is the virtual absolute path daspull uses for this dataset's file tree, regardless of provider.",
+      "type": "object",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "collection_id",
+            "root_path"
+          ],
+          "properties": {
+            "type": {
+              "const": "globus_https"
+            },
+            "collection_id": {
+              "description": "UUID of the Globus collection this dataset is browsed and downloaded through.",
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+            },
+            "root_path": {
+              "type": "string",
+              "pattern": "^/.+/$"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "base_url",
+            "persistent_id",
+            "root_path"
+          ],
+          "properties": {
+            "type": {
+              "const": "dataverse_https"
+            },
+            "base_url": {
+              "description": "Base URL of the Dataverse installation hosting this dataset, e.g. 'https://dataverse.no'.",
+              "type": "string",
+              "pattern": "^https://"
+            },
+            "persistent_id": {
+              "description": "The dataset's persistent identifier as Dataverse's API expects it, e.g. 'doi:10.18710/VPRD2H'.",
+              "type": "string",
+              "pattern": "^doi:"
+            },
+            "root_path": {
+              "type": "string",
+              "pattern": "^/.+/$"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "base_url",
+            "record_id",
+            "root_path"
+          ],
+          "properties": {
+            "type": {
+              "const": "zenodo_https"
+            },
+            "base_url": {
+              "description": "Base URL of the Zenodo instance hosting this dataset, e.g. 'https://zenodo.org'.",
+              "type": "string",
+              "pattern": "^https://"
+            },
+            "record_id": {
+              "description": "The dataset's numeric Zenodo record id, e.g. '5823343' (from https://zenodo.org/records/5823343 or the DOI 10.5281/zenodo.5823343).",
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            },
+            "root_path": {
+              "type": "string",
+              "pattern": "^/.+/$"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "base_url",
+            "prefix",
+            "root_path"
+          ],
+          "properties": {
+            "type": {
+              "const": "s3_https"
+            },
+            "base_url": {
+              "description": "HTTPS endpoint of the S3 bucket hosting this dataset, e.g. 'https://nrel-pds-porotomo.s3.amazonaws.com'.",
+              "type": "string",
+              "pattern": "^https://"
+            },
+            "prefix": {
+              "description": "The real S3 key prefix this dataset lives under within the (possibly shared) bucket, e.g. 'DAS/H5-standardized/DASH/'. root_path is the virtual equivalent daspull exposes for it.",
+              "type": "string",
+              "pattern": "^[^/].*/$"
+            },
+            "root_path": {
+              "type": "string",
+              "pattern": "^/.+/$"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "share_url",
+            "root_path"
+          ],
+          "properties": {
+            "type": {
+              "const": "dropbox_https"
+            },
+            "share_url": {
+              "description": "URL of the public Dropbox shared folder holding this dataset, e.g. 'https://www.dropbox.com/scl/fo/<id>/<rand>?rlkey=<key>' (no trailing 'dl' parameter -- the client controls that itself). Dropbox publishes no documented anonymous listing API, so the client browses the folder through the undocumented endpoint its own page calls and downloads each file from the per-file share URL that listing returns; see dropbox.py's module docstring.",
+              "type": "string",
+              "pattern": "^https://www\\.dropbox\\.com/"
+            },
+            "root_path": {
+              "type": "string",
+              "pattern": "^/.+/$"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "base_url",
+            "manifest_url",
+            "root_path"
+          ],
+          "properties": {
+            "type": {
+              "const": "pando_https"
+            },
+            "base_url": {
+              "description": "HTTPS endpoint of the Pando (Ceph RGW) object store hosting this dataset, e.g. 'https://pando-rgw01.chpc.utah.edu'. Anonymous bucket listing is denied here, unlike a real public S3 bucket, so this is used only to validate manifest URLs, not to browse.",
+              "type": "string",
+              "pattern": "^https://"
+            },
+            "manifest_url": {
+              "description": "URL of the data owner's static download-script manifest (e.g. a published 'get_all_*.sh') enumerating every file's full download URL; this is the only catalog available, since Pando has no public listing API.",
+              "type": "string",
+              "pattern": "^https://"
+            },
+            "root_path": {
+              "type": "string",
+              "pattern": "^/.+/$"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "base_url",
+            "repo_id",
+            "prefix",
+            "root_path"
+          ],
+          "properties": {
+            "type": {
+              "const": "huggingface_https"
+            },
+            "base_url": {
+              "description": "Base URL of the Hugging Face instance hosting the dataset repo, normally 'https://huggingface.co'.",
+              "type": "string",
+              "pattern": "^https://"
+            },
+            "repo_id": {
+              "description": "The Hugging Face dataset repo holding this dataset, as '<owner>/<name>', e.g. 'AI4EPS/quakeflow_das'.",
+              "type": "string",
+              "pattern": "^[^/]+/[^/]+$"
+            },
+            "revision": {
+              "description": "Git revision to read: a branch name such as 'main' (follows the repo as it grows) or an immutable commit SHA (reproducible, blind to later additions). Defaults to 'main' when omitted.",
+              "type": "string",
+              "minLength": 1
+            },
+            "prefix": {
+              "description": "The real repo path prefix this dataset lives under, e.g. 'eureka/data/'. One repo commonly holds several unrelated datasets side by side; root_path is the virtual equivalent daspull exposes for this one.",
+              "type": "string",
+              "pattern": "^[^/].*/$"
+            },
+            "root_path": {
+              "type": "string",
+              "pattern": "^/.+/$"
+            }
+          }
+        }
+      ]
+    },
+    "layout": {
+      "description": "How the dataset's remote file tree is organized, and how its filenames and directory names encode UTC timestamps. This is the operational metadata daspull reads to browse, time-filter, and download the dataset.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "primary_root",
+        "primary_pattern",
+        "blocks"
+      ],
+      "properties": {
+        "summary": {
+          "description": "One-line description of the array, shown in CLI help.",
+          "type": "string",
+          "minLength": 1
+        },
+        "primary_root": {
+          "description": "Subtree scanned when selecting the dataset's primary file type; must be at or below access.root_path.",
+          "type": "string",
+          "pattern": "^/.+/$"
+        },
+        "primary_pattern": {
+          "description": "Glob selecting the dataset's primary (DAS data) file type, e.g. '*.sgy'.",
+          "type": "string",
+          "minLength": 1
+        },
+        "blocks": {
+          "description": "Rules mapping a filename to the UTC interval it records. The first rule whose pattern matches wins; files matching none are never time-selected.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "pattern",
+              "timestamp_format"
+            ],
+            "oneOf": [
+              {
+                "required": [
+                  "duration_seconds"
+                ]
+              },
+              {
+                "required": [
+                  "duration_from_segy_size"
+                ]
+              },
+              {
+                "required": [
+                  "duration_group"
+                ]
+              }
+            ],
+            "properties": {
+              "pattern": {
+                "description": "Case-insensitive regex searched against the basename; capture group 1 is the timestamp.",
+                "type": "string",
+                "minLength": 1
+              },
+              "timestamp_format": {
+                "description": "strptime format for capture group 1; parsed as UTC.",
+                "type": "string",
+                "minLength": 1
+              },
+              "duration_seconds": {
+                "description": "Fixed block duration. Use 0 for filenames that timestamp an instantaneous event rather than a recorded block; instants are selected inclusively at the interval start and contribute no coverage.",
+                "type": "number",
+                "minimum": 0
+              },
+              "pre_roll_seconds": {
+                "description": "Seconds the recorded block actually starts before the instant captured by group 1, for filenames that timestamp a reference instant (e.g. a cataloged event's origin time) rather than the block's own start. Defaults to 0, meaning the timestamp is the block's start.",
+                "type": "number",
+                "minimum": 0
+              },
+              "duration_group": {
+                "description": "Index of a second capture group in `pattern` holding the block duration in seconds as plain digits, for filenames that encode a variable duration directly (e.g. '..._L160s.mat').",
+                "type": "integer",
+                "minimum": 2
+              },
+              "duration_from_segy_size": {
+                "description": "Derive block duration from the exact file size instead of a constant, for datasets whose block length varies per acquisition run.",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "file_header_bytes",
+                  "trace_header_bytes",
+                  "sample_bytes",
+                  "channels",
+                  "sample_interval_ms"
+                ],
+                "properties": {
+                  "file_header_bytes": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "trace_header_bytes": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "sample_bytes": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "channels": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "sample_interval_ms": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "directories": {
+          "description": "Rules mapping a date-named directory to the UTC span its contents can cover, letting a time-bounded scan prune whole directories. The first matching rule wins; unmatched directories are never pruned. Omit entirely for datasets with no date-based directory layout.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "pattern",
+              "timestamp_format",
+              "span"
+            ],
+            "properties": {
+              "pattern": {
+                "description": "Regex matched against the absolute directory path (with trailing slash); capture group 1 is the timestamp.",
+                "type": "string",
+                "minLength": 1
+              },
+              "timestamp_format": {
+                "description": "strptime format for capture group 1; parsed as UTC.",
+                "type": "string",
+                "minLength": 1
+              },
+              "span": {
+                "description": "Calendar length of the directory's own window.",
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                  "years": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "months": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "days": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "hours": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "pad_days": {
+                "description": "Slack added on both sides of the span, for directories named by a local calendar day whose contents cross UTC day boundaries.",
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "environment",
+        "source_type",
+        "applications"
+      ],
+      "properties": {
+        "environment": {
+          "enum": [
+            "onshore",
+            "offshore",
+            "underground",
+            "borehole",
+            "laboratory",
+            "mixed"
+          ]
+        },
+        "source_type": {
+          "enum": [
+            "passive",
+            "active",
+            "mixed"
+          ]
+        },
+        "applications": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+          }
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel_coordinates"
+      ],
+      "properties": {
+        "channel_coordinates": {
+          "enum": [
+            "none",
+            "partial",
+            "full",
+            "unknown"
+          ]
+        },
+        "known_issues": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

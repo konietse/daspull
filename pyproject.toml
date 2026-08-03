@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "daspull"
+version = "0.1.0"
+description = "Simple, dependency-light downloader for Distributed Acoustic Sensing (DAS) data - no Globus required."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+    { name = "Sebastian Konietzny", email = "koniet.se@gmail.com" }
+]
+keywords = ["DAS", "distributed acoustic sensing", "download", "seismology", "machine learning"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "requests>=2.31",
+    "tqdm>=4.66",
+    "pyyaml>=6",
+    "certifi>=2023",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "ruff>=0.4"]
+
+[project.scripts]
+daspull = "daspull.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/konietse/daspull"
+Issues = "https://github.com/konietse/daspull/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/daspull"]

@@ -1,0 +1,65 @@
+schema_version: 1
+id: gordas_1
+name: GorDAS-1
+provenance:
+  doi: https://doi.org/10.5066/P9NYAT5Z
+location:
+  latitude: 40.807
+  longitude: -124.087
+acquisition:
+  interrogator:
+    manufacturer: OptaSense
+    model: QuantX
+  start_date: '2022-06-03'
+  end_date: '2022-06-30'
+  duration_days: 28
+  sampling_rate_hz: 250
+  gauge_length_m: 8.168
+  channel_spacing_m: 2.042
+  cable_length_m: 15498
+  number_of_channels: 7590
+  measurement: phase
+data:
+  format: HDF5
+  size_gb: 23.714
+  catalog_observed_at: '2026-07-29'
+  downsampled: false
+access:
+  type: huggingface_https
+  base_url: https://huggingface.co
+  repo_id: AI4EPS/quakeflow_das
+  revision: main
+  prefix: eureka/data/
+  root_path: /GorDAS-1/
+layout:
+  summary: Telecom-fiber array between Arcata and Eureka, California (spring 2022 GorDAS deployment)
+  primary_root: /GorDAS-1/
+  primary_pattern: '*.h5'
+  blocks:
+  - pattern: '_(\d{4}-\d{2}-\d{2}T\d{6})Z\.h5$'
+    timestamp_format: '%Y-%m-%dT%H%M%S'
+    duration_seconds: 60
+  directories:
+  - pattern: '^/GorDAS-1/(\d{4}-\d{2}-\d{2})T'
+    timestamp_format: '%Y-%m-%d'
+    span:
+      days: 1
+    pad_days: 1
+domain:
+  environment: onshore
+  source_type: passive
+  applications:
+  - earthquake_detection
+  - subduction_zone_monitoring
+  - machine_learning_training
+  - ambient_noise_interferometry
+quality:
+  channel_coordinates: none
+  known_issues:
+  - Not a continuous archive (21 per-event windows from the spring 2022 Arcata-to-Eureka deployment) 147 files of 60 s each, one directory per earthquake, covering ~5 min before to 2 min after origin time. Time-range selection only ever matches inside those windows.
+  - Unlike GorDAS-2/MARS in the same repo, these files are not in the repo's documented "DAS event format". They're the interrogator's own PRODML/OptaSense HDF5 layout (`/Acquisition/Raw[0]/RawData`, int32), raw optical phase in `rad * 2PI/2^16`, no event attributes at all, and undescribed by the repo's README. Converting to strain rate is left to the user.
+  - The README documents only "arcata", "monterey_bay", and "ridgecrest_north". This "eureka" subset is matched to the USGS Spring 2022 Arcata-to-Eureka release (10.5066/P9NYAT5Z) by date/geometry, not an explicit statement in the repo.
+  - Interrogator named "OptaSense QuantX" here (per the GorDAS description). Files record only VendorCode "OptaSense IU Setup 1.8.6", and the README calls it "Luna QuantX" (Luna acquired OptaSense 2020).
+  - The cable_length_m value is derived (7,590 loci x 2.042 m = 15,498 m, from the files' own attributes), not published. GorDAS-2 re-bins the same fiber into 7,550/3,020 channels over an almost identical 15.4 km span.
+  - No per-channel geodetic coordinates published .Fiber route (Arcata to Eureka, owned by Vero Communications) described only in prose.
+  - Repo is a mutable git branch (`main`). Tile count/size can change under it, pin a commit SHA for a reproducible catalog.

@@ -1,0 +1,68 @@
+schema_version: 1
+id: gordas_2
+name: GorDAS-2
+provenance:
+  doi: https://doi.org/10.5066/P1V7CKGA
+location:
+  latitude: 40.807
+  longitude: -124.087
+acquisition:
+  interrogator:
+    manufacturer: OptaSense
+    model: QuantX
+  start_date: '2022-12-23'
+  end_date: '2024-12-31'
+  duration_days: 740
+  cable_length_m: 15416
+  measurement: strain_rate
+  configurations:
+  - sampling_rate_hz: 125
+    channel_spacing_m: 2.0419
+    gauge_length_m: 8.1676
+    number_of_channels: 7550
+    end: '2023-02-03 00:00:00'
+  - sampling_rate_hz: 100
+    channel_spacing_m: 5.1048
+    gauge_length_m: 8.1676
+    number_of_channels: 3020
+    start: '2023-02-03 00:00:00'
+data:
+  format: HDF5
+  size_gb: 509.72
+  catalog_observed_at: '2026-07-29'
+  downsampled: true
+  original_sampling_rate_hz: 250
+access:
+  type: huggingface_https
+  base_url: https://huggingface.co
+  repo_id: AI4EPS/quakeflow_das
+  revision: main
+  prefix: arcata/data/
+  root_path: /GorDAS-2/
+layout:
+  summary: Telecom-fiber array at Arcata, California, spanning the 2022 M6.4 Ferndale aftershock sequence
+  primary_root: /GorDAS-2/
+  primary_pattern: '*.h5'
+  blocks:
+  - pattern: '^(\d{8}T\d{6})Z\.h5$'
+    timestamp_format: '%Y%m%dT%H%M%S'
+    duration_seconds: 420
+domain:
+  environment: onshore
+  source_type: passive
+  applications:
+  - earthquake_detection
+  - aftershock_monitoring
+  - subduction_zone_monitoring
+  - machine_learning_training
+quality:
+  channel_coordinates: none
+  known_issues:
+  - Not a continuous archive 2,470 per-event windows (2022-12 to 2024-12), one file per window. Time-range selection only ever matches inside them.
+  - Window length isn't in the filename and is bimodal sampling 100 HDF5 headers found 59 windows of 420 s and 41 of 120 s, with no pattern the filename exposes. daspull assumes the longest (420 s) for every file, so a query never misses one but may select a 120 s file up to 5 minutes past its real end (`--list-intervals` overstates the same way). The filename's start timestamp itself is exact (matches `begin_time`).
+  - Two acquisition configs share the catalog (hence the required --sampling-rate/--channel-spacing) 7,550 ch @ 2.0419 m, 125 Hz (downsampled from 250 Hz) through 2023-02-02 22:13:15; 3,020 ch @ 5.1048 m, 100 Hz (not downsampled) from 2023-02-03 00:42:04 on. Verified via HDF5 headers of the first 857 files plus a sampled sweep through 2024-12-31, exactly one switch. Both window lengths occur in both configs. `data.downsampled`/`original_sampling_rate_hz` describe the first config only.
+  - 41 of 100 sampled files carry no `event_time`/`event_id`/`magnitude`, so magnitude/location-based selection isn't possible from the catalog alone.
+  - Sibling `arcata/phasenet/` and `arcata/phasenet_das/` prefixes hold model output (phase picks), not DAS data, and aren't part of this config.
+  - No per-channel geodetic coordinates published; fiber route (Arcata to Eureka, owned by Vero Communications) described only in prose.
+  - Interrogator named "OptaSense QuantX" here (per the GorDAS description). Tthe repo's README calls it "Luna QuantX" (Luna acquired OptaSense 2020).
+  - Repo is a mutable git branch (`main`); the underlying USGS release is itself versioned (v3.0, 2026-02). File count/size can change under it, pin a commit SHA for a reproducible catalog.

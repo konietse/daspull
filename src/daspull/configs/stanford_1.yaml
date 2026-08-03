@@ -1,0 +1,65 @@
+schema_version: 1
+id: stanford_1
+name: Stanford-1
+provenance:
+  doi: https://doi.org/10.1190/tle36121025.1
+location:
+  latitude: 37.4250
+  longitude: -122.1790
+acquisition:
+  interrogator:
+    manufacturer: OptaSense
+    model: ODH3
+  start_date: '2016-09-02'
+  end_date: '2019-03-31'
+  duration_days: 940
+  sampling_rate_hz: 50
+  gauge_length_m: 7.14
+  channel_spacing_m: 8.16
+  cable_length_m: 2500
+  number_of_channels: 626
+  measurement: strain_rate
+data:
+  format: SEG-Y
+  size_gb: 9912.551
+  catalog_observed_at: 2026-07-27
+  downsampled: false
+access:
+  type: globus_https
+  collection_id: 706e304c-5def-11ec-9b5c-f9dfb1abb183
+  root_path: /Stanford-1-Campus/
+layout:
+  summary: Urban campus array, Stanford, California
+  primary_root: /Stanford-1-Campus/Data/
+  primary_pattern: '*.sgy'
+  blocks:
+  - pattern: 'cbt_processed_(\d{8}_\d{6})\.\d{3}\+0000\.sgy$'
+    timestamp_format: '%Y%m%d_%H%M%S'
+    duration_seconds: 60
+  directories:
+  - pattern: '^/Stanford-1-Campus/Data/(\d{4}/\d{2}/\d{2})/$'
+    timestamp_format: '%Y/%m/%d'
+    span:
+      days: 1
+  - pattern: '^/Stanford-1-Campus/Data/(\d{4}/\d{2})/$'
+    timestamp_format: '%Y/%m'
+    span:
+      months: 1
+  - pattern: '^/Stanford-1-Campus/Data/(\d{4})/$'
+    timestamp_format: '%Y'
+    span:
+      years: 1
+domain:
+  environment: onshore
+  source_type: passive
+  applications:
+  - urban_seismic_monitoring
+  - ambient_noise_interferometry
+  - earthquake_monitoring
+  - near_surface_characterization
+quality:
+  channel_coordinates: partial
+  known_issues:
+  - The cable loop turns around near channel 315, so the array is roughly mirrored about that channel. Channels on either side don't sit at identical positions and stagger relative to one another (per the dataset readme).
+  - Recording isn't uniformly continuous across the 940-day span. Daily SEG-Y file counts vary widely (up to the nominal 1,440 one-minute blocks/day), reflecting acquisition interruptions.
+  - The geometry CSV geolocates channels 1-620 of 626. The last few channels aren't covered.

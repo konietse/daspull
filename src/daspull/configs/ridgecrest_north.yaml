@@ -1,0 +1,61 @@
+schema_version: 1
+id: ridgecrest_north
+name: Ridgecrest North
+provenance:
+  doi: https://doi.org/10.7909/C3WD3xH1
+location:
+  latitude: 35.6517
+  longitude: -117.7106
+acquisition:
+  interrogator:
+    manufacturer: OptaSense
+    model: ODH3
+  start_date: '2020-06-20'
+  end_date: '2020-07-29'
+  duration_days: 40
+  sampling_rate_hz: 250
+  gauge_length_m: 16.34
+  channel_spacing_m: 8
+  cable_length_m: 9099
+  number_of_channels: 1250
+  measurement: phase
+data:
+  format: SEG-Y
+  size_gb: 4090.776
+  catalog_observed_at: '2026-07-29'
+  downsampled: true
+  original_sampling_rate_hz: 5000
+access:
+  type: s3_https
+  base_url: https://scedc-pds.s3.amazonaws.com
+  prefix: Ridgecrest_DAS/
+  root_path: /RidgecrestNorth/
+layout:
+  summary: Telecom-fiber array, Ridgecrest to Inyokern airport, California
+  primary_root: /RidgecrestNorth/SEG-Y/hourly/
+  primary_pattern: '*.segy'
+  blocks:
+  - pattern: '^(\d{10})\.segy$'
+    timestamp_format: '%Y%m%d%H'
+    duration_seconds: 3600
+domain:
+  environment: onshore
+  source_type: passive
+  applications:
+  - earthquake_detection
+  - aftershock_monitoring
+  - ambient_noise_interferometry
+quality:
+  channel_coordinates: partial
+  known_issues:
+  - The ~40-day archived window (Jun/Jul 2020) is not the 2019 Ridgecrest rapid-response deployment in Li et al. 2021 (10.1029/2021AV000395, 2019-07-10 to 10-04). The array itself recorded until ~March 2022 per later literature, but only this later window is published here.
+  - The bucket's README_citation.txt and SCEDC's web page both state the archive starts 2020-06-23. A full listing shows it actually starts 2020-06-20, three days earlier than documented.
+  - 51 of 960 nominal hours are missing (all of 2020-06-30, 19/24 h on 2020-07-27, plus scattered 1-2 h gaps). From a full listing, not any published manifest.
+  - Every SEG-Y reel header is all-zero, so trace/sample count and format follow only from the fixed file size and per-trace headers. Trace headers are little-endian, unlike the SEG-Y standard's big-endian convention (verified against 3 files).
+  - Samples are raw optical phase, not strain. Gauge length (16.34 m) is from Zhai et al. (2025)'s Table 1, not the provider. SCEDC's own tutorial notebooks instead convert to nanostrain via a factor implying an 8 m gauge, a discrepancy left unresolved here.
+  - Recorded at 250 Hz, downsampled from an original 5000 Hz pulse-repetition rate per later literature (Zhai et al. 2025), not the provider.
+  - Each file's 1250 traces join the bucket's das_info.csv (1150 rows) by index (25-1249, with 7 gaps), not trace position. Its elevation_m column is a placeholder (only 0.0/90.0 appear) and unusable.
+  - channel_spacing_m / cable_length_m  are computed from das_info.csv's geolocated channels only (median spacing 7.95 m, rounded to the nominal 8 m. Cumulative distance 9099 m), slightly undercounting the true fiber.
+  - SEG-Y ETags are multipart, so downloads verify by size only, not checksum.
+  - Interrogator model ("OptaSense ODH3") is from later literature (Zhai et al. 2025), not SCEDC.
+  - This ~10 km Ridgecrest-to-Inyokern fiber is "Ridgecrest North" in later literature, distinct from the unrelated ~100 km "Ridgecrest South" array (Aug 2021, different fiber, no bulk archive, only 7 of ~10,000 channels available, as ordinary FDSN seismometer stations CI DRS02-DRS08).

@@ -1,0 +1,52 @@
+schema_version: 1
+id: fairbanks
+name: Fairbanks
+provenance:
+  doi: https://doi.org/10.1029/2021GL097195
+location:
+  latitude: 64.876
+  longitude: -147.672
+acquisition:
+  interrogator:
+    manufacturer: Silixa
+    model: iDAS-v2
+  duration_days: 59
+  sampling_rate_hz: 1000
+  gauge_length_m: 10
+  channel_spacing_m: 1
+  cable_length_m: 4000
+  measurement: strain_rate
+data:
+  format: TDMS
+  size_gb: 5473.873
+  catalog_observed_at: 2026-07-27
+  downsampled: false
+access:
+  type: globus_https
+  collection_id: 706e304c-5def-11ec-9b5c-f9dfb1abb183
+  root_path: /Fairbanks/
+layout:
+  summary: Permafrost monitoring array, Fairbanks, Alaska
+  primary_root: /Fairbanks/Data/tdms/
+  primary_pattern: '*.tdms'
+  blocks:
+  - pattern: '_(\d{12})\.tdms$'
+    timestamp_format: '%y%m%d%H%M%S'
+    duration_seconds: 60
+  - pattern: 'SRU2_(\d{14})\.csv$'
+    timestamp_format: '%Y%m%d%H%M%S'
+    duration_seconds: 0
+  directories:
+  - pattern: '^/Fairbanks/Data/(?:tdms|sweeps)/(\d{8})\d{6}_data/$'
+    timestamp_format: '%Y%m%d'
+    span:
+      days: 1
+domain:
+  environment: onshore
+  source_type: active
+  applications:
+  - permafrost_monitoring
+  - time_lapse_monitoring
+  - near_surface_characterization
+quality:
+  channel_coordinates: partial

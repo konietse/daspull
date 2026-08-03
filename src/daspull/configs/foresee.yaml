@@ -1,0 +1,57 @@
+schema_version: 1
+id: foresee
+name: FORESEE
+provenance:
+  doi: https://doi.org/10.5194/se-12-219-2021
+location:
+  latitude: 40.805
+  longitude: -77.863
+acquisition:
+  interrogator:
+    manufacturer: Silixa
+    model: iDAS-v2
+  start_date: '2019-04-05'
+  end_date: '2020-03-14'
+  duration_days: 344
+  sampling_rate_hz: 125
+  gauge_length_m: 10
+  channel_spacing_m: 2
+  cable_length_m: 4900
+  number_of_channels: 2137
+  measurement: strain_rate
+data:
+  format: HDF5
+  size_gb: 15020.892
+  catalog_observed_at: 2026-07-27
+  downsampled: true
+  original_sampling_rate_hz: 500
+access:
+  type: globus_https
+  collection_id: 706e304c-5def-11ec-9b5c-f9dfb1abb183
+  root_path: /FORESEE/
+layout:
+  summary: Urban monitoring array, Pennsylvania State University campus
+  primary_root: /FORESEE/Data/
+  primary_pattern: '*.hdf5'
+  blocks:
+  - pattern: 'FORESEE_UTC_(\d{8}_\d{6})\.hdf5$'
+    timestamp_format: '%Y%m%d_%H%M%S'
+    duration_seconds: 600
+  directories:
+  - pattern: '^/FORESEE/Data/(\d{6})/$'
+    timestamp_format: '%Y%m'
+    span:
+      months: 1
+domain:
+  environment: onshore
+  source_type: passive
+  applications:
+  - earthquake_monitoring
+  - urban_monitoring
+  - environmental_monitoring
+  - seismic_noise_analysis
+quality:
+  channel_coordinates: full
+  known_issues:
+  - Recording gaps caused by power outages on several dates between 2019-04-05 and 2020-03-14.
+  - Sampling rate was temporarily changed from 500 Hz to 1000 Hz between 2020-02-20 18:43 UTC and 2020-02-21 13:34 UTC.

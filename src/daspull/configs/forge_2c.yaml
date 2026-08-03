@@ -1,0 +1,56 @@
+schema_version: 1
+id: forge_2c
+name: FORGE Phase 2C
+provenance:
+  doi: https://doi.org/10.15121/1603679
+location:
+  latitude: 38.500182
+  longitude: -112.883229
+acquisition:
+  interrogator:
+    manufacturer: Silixa
+    model: iDAS v3
+  start_date: '2019-04-19'
+  end_date: '2019-05-03'
+  duration_days: 15
+  sampling_rate_hz: 2000
+  gauge_length_m: 10
+  channel_spacing_m: 1
+  cable_length_m: null
+  measurement: strain_rate
+data:
+  format: SEG-Y
+  size_gb: 13000
+  downsampled: false
+access:
+  type: pando_https
+  base_url: https://pando-rgw01.chpc.utah.edu
+  manifest_url: https://constantine.seis.utah.edu/files/get_all_silixa.sh
+  root_path: /FORGE_2C/
+layout:
+  summary: Vertical monitoring-well fiber-optic array (Silixa iDAS), Utah FORGE geothermal field, Milford, Utah
+  primary_root: /FORGE_2C/
+  primary_pattern: '*.sgy'
+  blocks:
+  - pattern: 'FORGE_78-32_iDASv3-P11_UTC(\d{12})\.sgy$'
+    timestamp_format: '%y%m%d%H%M%S'
+    duration_seconds: 15
+domain:
+  environment: borehole
+  source_type: passive
+  applications:
+  - geothermal_reservoir_monitoring
+  - microseismic_monitoring
+  - hydraulic_stimulation_monitoring
+  - induced_seismicity_monitoring
+quality:
+  channel_coordinates: unknown
+  known_issues:
+  - Pando denies anonymous bucket listing ("403 AccessDenied") though anonymous GET/HEAD on a known object succeeds, so unlike every other provider here the catalog can't come from a live listing. It's parsed from the Utah FORGE team's own published wget manifest (get_all_silixa.sh), hence the `pando_https` access type rather than `s3_https`.
+  - The manifest lists bare filenames with no size/checksum, so a catalog scan reports size 0 for unresolved files. A live HEAD (on a literal `--include` or right before download) fills in the real size and MD5.
+  - Recording coverage is uneven across the 15 daily buckets (e.g. 2019-04-20 has only 445 of a full day's 5,760 files). Real acquisition gaps, not a broken download.
+  - Block duration is nominally 15 s (2 kHz, 30,000 samples/trace, 1,088 channels) but not exactly constant. Channel count changed at least once (1,280 channels, a shorter 10.8 s block) at the very end of the run on 2019-05-03.
+  - The ~13 TB total size is the FORGE team's own published figure, not a live re-scan like this project's other configs use. Pando's lack of a listing API makes re-scanning 70,000+ objects impractical.
+  - Gauge length (10 m) is from Pankow et al. (2020, Stanford SGW proceedings), not the GDR submission itself. Channel spacing is not stated in any published metadata either; each trace header carries a monotonic per-channel "FIBREDIST" field (~3,350 raw units/channel) but its physical unit is undocumented, so it's not reported here in meters.
+  - Well 78-32 is a vertical hole cemented with fiber to ~998 m depth, ~1,200 ft into granitoid basement, monitoring stimulation of nearby well 58-32. ~40 microseismic events (-1.5 to -0.5 M) were detected per the GDR submission's documentation.
+  - constantine.seis.utah.edu (the manifest host; downloads go straight to Pando) serves an incomplete TLS chain. Its intermediate (InCommon RSA Server CA 2) is never sent, so plain `requests`/certifi fails with `SSLCertVerificationError` where a browser papers over it. `pando.py` bundles that intermediate alongside certifi's roots rather than disabling verification; see the module docstring.

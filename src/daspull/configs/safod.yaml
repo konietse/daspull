@@ -1,0 +1,59 @@
+schema_version: 1
+id: safod
+name: SAFOD
+provenance:
+  doi: https://doi.org/10.1029/2019JB017533
+location:
+  latitude: 35.9742039
+  longitude: -120.5521414
+acquisition:
+  interrogator:
+    manufacturer: OptaSense
+    model: ODH3.1
+  start_date: '2017-06-23'
+  end_date: '2017-07-10'
+  duration_days: 18
+  sampling_rate_hz: 250
+  gauge_length_m: 10
+  channel_spacing_m: 1
+  cable_length_m: 800
+  number_of_channels: 800
+  measurement: strain
+data:
+  format: NPY
+  size_gb: 1.536
+  catalog_observed_at: 2026-07-28
+  downsampled: true
+  original_sampling_rate_hz: 2500
+access:
+  type: dropbox_https
+  share_url: https://www.dropbox.com/scl/fo/fiwbxwfpz65qbx2bu441b/AKY86kM-Zbbie7_v8v62iKI?rlkey=plqbl8wfb5n90ycpgc7vhms7a
+  root_path: /SAFOD/
+layout:
+  summary: Downhole fiber-optic array, San Andreas Fault Observatory at Depth (SAFOD), Parkfield, California
+  primary_root: /SAFOD/
+  primary_pattern: '*.npy'
+  blocks:
+  - pattern: '(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6})Z_mag[\w.-]+\.npy$'
+    timestamp_format: '%Y-%m-%dT%H:%M:%S.%f'
+    duration_seconds: 59.996
+    pre_roll_seconds: 10
+domain:
+  environment: borehole
+  source_type: passive
+  applications:
+  - earthquake_detection
+  - microseismic_monitoring
+  - seismic_velocity_estimation
+  - ambient_noise_interferometry
+quality:
+  channel_coordinates: none
+  known_issues:
+  - Not a continuous archive. A 31-event excerpt catalog, one file per USGS-cataloged local earthquake (plus one depositor-detected event with no USGS magnitude, tagged "magUNKNOWN"), not the ~22 usable days of continuous recording described in the paper. Time-range selection only ever matches within these 31 windows.
+  - Each filename's timestamp is the event's origin time, not the recording's start. Every file starts 10 s before it and ends 50 s after (60 s total, `pre_roll_seconds` of 10 encodes this).
+  - The "magUNKNOWN" file is float64, not the float32 of every other file, hence double the byte size despite the identical 800 x 14,999 window, not a longer recording.
+  - Downsampled to 250 Hz from the native 2,500 Hz (median removal, anti-alias high-cut, decimation) per the GitHub README. The full-rate continuous archive isn't published here.
+  - No per-channel geodetic coordinates published. Only the wellhead location (35.9742039 N, -120.5521414 E, elev. 660.5 m) and each event's radius/azimuth/polar angle (in the GitHub repo's `catalog.csv`).
+  - The fiber continues to 864 m depth, but a loop failure at its far end left only 0-800 m usable; hence `cable_length_m` is 800, not the fiber's full length.
+  - The paper's data-availability statement instead names a smaller repo (`github.com/ariellellouch/SAFODDAS`, ~9 MB) with only 2 earthquakes and VSP comparison shots, not this broader 31-event catalog; both come from the same deployment.
+  - No trace editing beyond the steps above, per the depositor's note on the companion SAFODDAS repo.
