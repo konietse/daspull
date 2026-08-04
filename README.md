@@ -11,7 +11,6 @@ No provider-specific tooling required, just Python and HTTP.
 
 <p align="center">
   <a href="https://pypi.org/project/daspull/"><img alt="PyPI" src="https://img.shields.io/pypi/v/daspull?logo=pypi&logoColor=white&color=3775A9&cacheSeconds=300"></a>
-  <a href="https://anaconda.org/conda-forge/daspull"><img alt="conda-forge" src="https://img.shields.io/conda/vn/conda-forge/daspull?logo=anaconda&logoColor=white&color=44A833&cacheSeconds=300"></a>
   <a href="https://pypi.org/project/daspull/"><img alt="Python 3.9+" src="https://img.shields.io/pypi/pyversions/daspull?logo=python&logoColor=white&color=3776AB&cacheSeconds=300"></a>
   <img alt="Linux, macOS, Windows" src="https://img.shields.io/badge/OS-Linux%20%7C%20macOS%20%7C%20Windows-4c566a">
   <a href="https://github.com/konietse/daspull/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/konietse/daspull/ci.yml?branch=main&label=tests&logo=githubactions&logoColor=white"></a>
@@ -42,7 +41,6 @@ As a library, into an existing project or environment:
 
 ```bash
 uv add daspull             # or: pip install daspull
-conda install -c conda-forge daspull
 ```
 
 ## Usage
