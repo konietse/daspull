@@ -12,8 +12,9 @@ No provider-specific tooling required, just Python and HTTP.
 <p align="center">
   <a href="https://pypi.org/project/daspull/"><img alt="PyPI" src="https://img.shields.io/pypi/v/daspull?logo=pypi&logoColor=white&color=3775A9&cacheSeconds=300"></a>
   <a href="https://pypi.org/project/daspull/"><img alt="Python 3.9+" src="https://img.shields.io/pypi/pyversions/daspull?logo=python&logoColor=white&color=3776AB&cacheSeconds=300"></a>
-  <img alt="Linux, macOS, Windows" src="https://img.shields.io/badge/OS-Linux%20%7C%20macOS%20%7C%20Windows-4c566a">
   <a href="https://github.com/konietse/daspull/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/konietse/daspull/ci.yml?branch=main&label=tests&logo=githubactions&logoColor=white"></a>
+  <img alt="Linux, macOS, Windows" src="https://img.shields.io/badge/OS-Linux%20%7C%20macOS%20%7C%20Windows-4c566a">
+  <a href="https://doi.org/10.5281/zenodo.21789169"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.21789169.svg?v=1"></a>
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2ea44f"></a>
   <a href="PRIVACY.md"><img alt="Privacy Policy" src="https://img.shields.io/badge/Privacy-Policy-6c5ce7"></a>
   <a href="TERMS.md"><img alt="Terms of Use" src="https://img.shields.io/badge/Terms-of%20Use-6c5ce7"></a>
@@ -96,6 +97,22 @@ and Globus login is available as `daspull.login(provider="globus")`. Full walkth
 opening a dataset once and customising a provider client, is in
 [`docs/python-api.md`](docs/python-api.md).
 
+
+## Citation
+
+If you use DASPull in your research, please cite it as below:
+
+```
+@software{Konietzny_DASPull_2026,
+  author    = {Konietzny, Sebastian},
+  title     = {DASPull},
+  version   = {0.1.0},
+  date      = {2026-08-04},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.21789169},
+  url       = {https://doi.org/10.5281/zenodo.21789169}
+}
+```
 
 ## References
 <a id="ref1"></a>**[1]**
