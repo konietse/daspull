@@ -16,7 +16,7 @@ acquisition:
   gauge_length_m: 10
   channel_spacing_m: 1.021
   number_of_channels: 384
-  measurement: phase
+  measurement: strain_rate
 data:
   format: HDF5
   size_gb: 706.352
