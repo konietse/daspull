@@ -10,11 +10,9 @@ acquisition:
   interrogator:
     manufacturer: Silixa
     model: iDAS-v2
-  duration_days: 59
   sampling_rate_hz: 1000
   gauge_length_m: 10
   channel_spacing_m: 1
-  cable_length_m: 4000
   measurement: strain_rate
 data:
   format: TDMS

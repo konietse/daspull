@@ -12,11 +12,9 @@ acquisition:
     model: QuantX
   start_date: '2022-06-03'
   end_date: '2022-06-30'
-  duration_days: 28
   sampling_rate_hz: 250
   gauge_length_m: 8.168
   channel_spacing_m: 2.042
-  cable_length_m: 15498
   number_of_channels: 7590
   measurement: phase
 data:

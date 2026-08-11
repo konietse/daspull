@@ -12,11 +12,9 @@ acquisition:
     model: A1-R
   start_date: '2020-09-01'
   end_date: '2020-09-15'
-  duration_days: 15
   sampling_rate_hz: 250
   gauge_length_m: 30.4
   channel_spacing_m: 16.8
-  cable_length_m: 50000
   number_of_channels: 2977
   measurement: strain_rate
 data:

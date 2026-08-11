@@ -12,8 +12,6 @@ acquisition:
     model: ODH4
   start_date: '2017-10-06'
   end_date: '2017-10-12'
-  duration_days: 6
-  cable_length_m: 2500
   measurement: strain_rate
   configurations:
   - sampling_rate_hz: 50

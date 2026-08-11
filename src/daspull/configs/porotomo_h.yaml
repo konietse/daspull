@@ -12,11 +12,9 @@ acquisition:
     model: iDAS
   start_date: '2016-03-08'
   end_date: '2016-03-26'
-  duration_days: 19
   sampling_rate_hz: 1000
   gauge_length_m: 10
   channel_spacing_m: 1.021
-  cable_length_m: 8904.14
   number_of_channels: 8721
   measurement: phase
 data:

@@ -12,11 +12,9 @@ acquisition:
     model: ODH3
   start_date: '2020-06-20'
   end_date: '2020-07-29'
-  duration_days: 40
   sampling_rate_hz: 250
   gauge_length_m: 16.34
   channel_spacing_m: 8
-  cable_length_m: 9099
   number_of_channels: 1250
   measurement: phase
 data:

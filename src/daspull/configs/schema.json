@@ -68,8 +68,6 @@
       "additionalProperties": false,
       "required": [
         "interrogator",
-        "duration_days",
-        "cable_length_m",
         "measurement"
       ],
       "properties": {
@@ -98,10 +96,6 @@
         "end_date": {
           "type": "string",
           "format": "date"
-        },
-        "duration_days": {
-          "type": "integer",
-          "minimum": 1
         },
         "sampling_rate_hz": {
           "oneOf": [
@@ -139,17 +133,6 @@
         "number_of_channels": {
           "type": "integer",
           "minimum": 1
-        },
-        "cable_length_m": {
-          "oneOf": [
-            {
-              "type": "number",
-              "exclusiveMinimum": 0
-            },
-            {
-              "type": "null"
-            }
-          ]
         },
         "measurement": {
           "enum": [

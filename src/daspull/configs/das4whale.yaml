@@ -12,11 +12,9 @@ acquisition:
     model: OptoDAS
   start_date: '2020-06-27'
   end_date: '2020-07-16'
-  duration_days: 20
   sampling_rate_hz: 645.16
   gauge_length_m: 8.16
   channel_spacing_m: 4
-  cable_length_m: 120000
   measurement: strain
 data:
   format: MAT
