@@ -139,6 +139,7 @@
             "strain",
             "strain_rate",
             "phase",
+            "phase_sift",
             "velocity"
           ]
         },
