@@ -15,6 +15,7 @@ acquisition:
   sampling_rate_hz: 50
   gauge_length_m: 8.16
   channel_spacing_m: 4.08
+  number_of_channels: 3054
   measurement: strain
 data:
   format: MAT
