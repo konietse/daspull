@@ -12,20 +12,16 @@ acquisition:
     model: QuantX
   start_date: '2022-12-23'
   end_date: '2024-12-31'
-  duration_days: 740
-  cable_length_m: 15416
   measurement: strain_rate
   configurations:
   - sampling_rate_hz: 125
     channel_spacing_m: 2.0419
     gauge_length_m: 8.1676
     number_of_channels: 7550
-    end: '2023-02-03 00:00:00'
   - sampling_rate_hz: 100
     channel_spacing_m: 5.1048
     gauge_length_m: 8.1676
     number_of_channels: 3020
-    start: '2023-02-03 00:00:00'
 data:
   format: HDF5
   size_gb: 509.72
