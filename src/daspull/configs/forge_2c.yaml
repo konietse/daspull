@@ -12,11 +12,9 @@ acquisition:
     model: iDAS v3
   start_date: '2019-04-19'
   end_date: '2019-05-03'
-  duration_days: 15
   sampling_rate_hz: 2000
   gauge_length_m: 10
   channel_spacing_m: 1
-  cable_length_m: null
   measurement: strain_rate
 data:
   format: SEG-Y
