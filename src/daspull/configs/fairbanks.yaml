@@ -13,6 +13,7 @@ acquisition:
   sampling_rate_hz: 1000
   gauge_length_m: 10
   channel_spacing_m: 1
+  number_of_channels: 5248
   measurement: strain_rate
 data:
   format: TDMS
