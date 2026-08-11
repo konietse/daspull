@@ -12,11 +12,9 @@ acquisition:
     model: iDAS-v2
   start_date: '2019-04-05'
   end_date: '2020-03-14'
-  duration_days: 344
   sampling_rate_hz: 125
   gauge_length_m: 10
   channel_spacing_m: 2
-  cable_length_m: 4900
   number_of_channels: 2137
   measurement: strain_rate
 data:
