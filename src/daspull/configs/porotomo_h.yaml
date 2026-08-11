@@ -10,7 +10,7 @@ acquisition:
   interrogator:
     manufacturer: Silixa
     model: iDAS
-  start_date: '2016-03-08'
+  start_date: '2016-03-11'
   end_date: '2016-03-26'
   sampling_rate_hz: 1000
   gauge_length_m: 10
@@ -19,18 +19,18 @@ acquisition:
   measurement: phase
 data:
   format: HDF5
-  size_gb: 42753.473
-  catalog_observed_at: 2026-07-28
+  size_gb: 42528.556
+  catalog_observed_at: 2026-08-11
   downsampled: false
 access:
   type: s3_https
   base_url: https://nrel-pds-porotomo.s3.amazonaws.com
-  prefix: DAS/H5-standardized/DASH/
+  prefix: DAS/H5/DASH/
   root_path: /PoroTomo_H/
 layout:
   summary: Horizontal trenched fiber-optic array (DASH), Brady Hot Springs geothermal field, Nevada
   primary_root: /PoroTomo_H/
-  primary_pattern: '*.h5'
+  primary_pattern: 'PoroTomo_iDAS*_????????????.h5'
   blocks:
   - pattern: 'PoroTomo_iDAS\d+_(\d{12})\.h5$'
     timestamp_format: '%y%m%d%H%M%S'
@@ -52,8 +52,9 @@ quality:
   channel_coordinates: none
   known_issues:
   - Recording had interruptions during the deployment. Daily file counts range from 123 to 2880 (a full day at 30 s/file), see the bucket's own DASH_file_count.txt manifest at the S3 bucket root.
-  - Converted from the original SEG-Y via the GDR's "DAS Data Pipeline", a derived representation, not raw interrogator output.
+  - Genuine raw iDAS interrogator output (per the GDR submission's own format description), unlike the sibling H5-standardized/ tree, which is derived from SEG-Y via the GDR's "DAS Data Pipeline".
+  - This raw-HDF5 tree only covers 2016-03-11 through 2016-03-26 (16 days). The deployment's first three days, 2016-03-08 to 03-10, exist in the SEG-Y and H5-standardized representations but were never uploaded here.
   - Filenames encode a bare local timestamp (yymmddHHMMSS) with no documented timezone. Treated as UTC (GPS-disciplined convention) but unverified against the underlying SEG-Y trace headers.
   - Raw measurement is optical phase, not strain/strain-rate.
   - A separate, unrelated 2018 explosion-test dataset (GDR submission 1517) shares this S3 bucket under a sibling "DASH_NV-test-site-explosion_standardized/" prefix and isn't part of this config.
-  - This bucket's raw-HDF5 tree (DAS/H5/DASH/, unused here) stores each 30 s block twice. Once individually, once in a daily merged file. Roughly doubling its footprint versus this standardized representation.
+  - Each 30 s block also exists in a per-day merged file directly under DAS/H5/DASH/ (e.g. PoroTomo_iDAS16043_20160311.h5), published for HSDS access rather than direct download. `primary_pattern` requires the 12-digit per-block timestamp (absent from these 8-digit-dated merged files) to exclude them, since downloading both would roughly double the transfer.

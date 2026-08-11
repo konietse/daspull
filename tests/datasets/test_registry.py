@@ -5,6 +5,7 @@ these cover the loader and the invariants every config must satisfy.
 """
 
 import json
+import re
 
 import pytest
 
@@ -43,7 +44,11 @@ def test_every_dataset_has_at_least_one_filename_timestamp_rule(name):
 def test_primary_pattern_only_matches_the_primary_file_type(name):
     dataset = DATASETS[name]
 
-    assert dataset.primary_pattern.startswith("*.")
+    # Usually a bare extension glob ('*.h5'); porotomo_h/porotomo_v are more
+    # specific ('PoroTomo_iDAS*_????????????.h5') to exclude a same-extension
+    # file that shares their primary_root -- a per-day merged copy of every
+    # block, published for HSDS access rather than direct download.
+    assert re.search(r"[*?].*\.[A-Za-z0-9]+$", dataset.primary_pattern)
     assert dataset.block_label == dataset.metadata["data"]["format"]
 
 

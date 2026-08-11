@@ -19,18 +19,18 @@ acquisition:
   measurement: phase
 data:
   format: HDF5
-  size_gb: 1056.55
-  catalog_observed_at: 2026-07-28
+  size_gb: 706.352
+  catalog_observed_at: 2026-08-11
   downsampled: false
 access:
   type: s3_https
   base_url: https://nrel-pds-porotomo.s3.amazonaws.com
-  prefix: DAS/H5-standardized/DASV/
+  prefix: DAS/H5/DASV/
   root_path: /PoroTomo_V/
 layout:
   summary: Vertical borehole fiber-optic array (DASV), Brady Hot Springs geothermal field, Nevada
   primary_root: /PoroTomo_V/
-  primary_pattern: '*.h5'
+  primary_pattern: 'PoroTomo_iDAS*_????????????.h5'
   blocks:
   - pattern: 'PoroTomo_iDAS\d+_(\d{12})\.h5$'
     timestamp_format: '%y%m%d%H%M%S'
@@ -52,9 +52,10 @@ quality:
   channel_coordinates: none
   known_issues:
   - Recording had interruptions during the deployment, similar to the horizontal array (see porotomo_h).
-  - This standardized HDF5 conversion only covers 2016-03-17 to 03-26 (10 days). The physical deployment ran through 03-28 (12 days) in the original SEG-Y. The last 2 days aren't available in this format.
+  - This HDF5 representation only covers 2016-03-17 to 03-26 (10 days), identically in both the raw and H5-standardized trees. The physical deployment ran through 03-28 (12 days) in the original SEG-Y. The last 2 days aren't available in either HDF5 format.
   - The 20160317/ folder holds only 2 files, both timestamped 2016-03-18. The real continuous 30 s cadence effectively begins in 20160318/, and 03-17 holds only setup/leftover files.
-  - Converted from the original SEG-Y via the GDR's "DAS Data Pipeline". A derived representation, not raw interrogator output.
+  - Genuine raw iDAS interrogator output (per the GDR submission's own format description), unlike the sibling H5-standardized/ tree, which is derived from SEG-Y via the GDR's "DAS Data Pipeline".
   - Filenames encode a bare local timestamp (yymmddHHMMSS) with no documented timezone. Treated as UTC (GPS-disciplined convention) but unverified against the underlying SEG-Y trace headers.
   - Raw measurement is optical phase, not strain/strain-rate. The 363 m well length doesn't evenly divide by 1.021 m x 384 channels. Treat channel_spacing_m as nominal, not an exact fit for this short array.
   - A separate, unrelated 2018 explosion-test dataset (GDR submission 1517) shares this S3 bucket under a sibling prefix and isn't part of this config.
+  - Each 30 s block also exists in a per-day merged file directly under DAS/H5/DASV/ (e.g. PoroTomo_iDAS025_20160317.h5), published for HSDS access rather than direct download. `primary_pattern` requires the 12-digit per-block timestamp (absent from these 8-digit-dated merged files) to exclude them, since downloading both would roughly double the transfer.
