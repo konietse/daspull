@@ -4,8 +4,8 @@ name: GorDAS-2
 provenance:
   doi: https://doi.org/10.5066/P1V7CKGA
 location:
-  latitude: 40.807
-  longitude: -124.087
+  latitude: 40.529
+  longitude: -124.302
 acquisition:
   interrogator:
     manufacturer: OptaSense
