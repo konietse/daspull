@@ -16,7 +16,7 @@ acquisition:
   gauge_length_m: 7.14
   channel_spacing_m: 8.16
   number_of_channels: 626
-  measurement: strain_rate
+  measurement: strain
 data:
   format: SEG-Y
   size_gb: 9912.551
