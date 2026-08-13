@@ -332,7 +332,9 @@ def test_foresee_lists_continuous_hdf5_intervals(monkeypatch, capsys):
     ]
 
 
-def test_list_intervals_with_output_dir_also_writes_a_csv(monkeypatch, capsys, tmp_path):
+def test_list_intervals_with_output_dir_also_writes_a_csv(
+    monkeypatch, capsys, tmp_path
+):
     files = [
         RemoteFile("/FORESEE/Data/201904/FORESEE_UTC_20190404_195804.hdf5", 100),
         RemoteFile("/FORESEE/Data/201904/FORESEE_UTC_20190404_194804.hdf5", 100),
