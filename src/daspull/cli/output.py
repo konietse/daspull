@@ -6,7 +6,9 @@ each line is flushed rather than buffered until the scan ends.
 
 from __future__ import annotations
 
+import csv
 from collections.abc import Sequence
+from pathlib import Path
 
 from ..catalog import RemoteFile
 from ..datasets.layout import Interval
@@ -36,6 +38,19 @@ def print_time_intervals(intervals: Sequence[Interval]) -> None:
     for start, end in intervals:
         print(f"{start:%Y-%m-%d %H:%M:%S}    {end:%Y-%m-%d %H:%M:%S}")
     print(f"{len(intervals)} interval(s)")
+
+
+def write_time_intervals_csv(intervals: Sequence[Interval], path: Path) -> None:
+    """Write *intervals* as a two-column ``start_utc,end_utc`` CSV at *path*.
+
+    Timestamps use the same UTC format as :func:`print_time_intervals`.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(["start_utc", "end_utc"])
+        for start, end in intervals:
+            writer.writerow([f"{start:%Y-%m-%d %H:%M:%S}", f"{end:%Y-%m-%d %H:%M:%S}"])
 
 
 def _format_size(size: int) -> str:
