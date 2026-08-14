@@ -134,7 +134,9 @@ def download(
                 partial_size = 0
 
             response_size = int(response.headers.get("content-length", 0))
-            total = response_size + partial_size if response_size else expected_size or 0
+            total = (
+                response_size + partial_size if response_size else expected_size or 0
+            )
             mode = "ab" if resumed else "wb"
             with (
                 open(tmp_path, mode) as f,
