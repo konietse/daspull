@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 from ..client import DatasetClient
 from ..datasets import (
@@ -34,6 +35,7 @@ from .output import (
     print_file_list,
     print_file_summary,
     print_time_intervals,
+    write_time_intervals_csv,
 )
 
 
@@ -62,8 +64,12 @@ def build_dataset_parser(dataset: DatasetSpec) -> argparse.ArgumentParser:
     parser.add_argument(
         "-o",
         "--output-dir",
-        default=dataset.name,
-        help=f"Destination directory (default: {dataset.name}).",
+        default=None,
+        help=(
+            f"Destination directory (default: {dataset.name}). With "
+            "--list-intervals, also writes the listed intervals to "
+            f"<dir>/{dataset.name}_intervals.csv when given."
+        ),
     )
     parser.add_argument(
         "--list", action="store_true", help="List matching remote files only."
@@ -259,6 +265,10 @@ def main_dataset(argv: list[str], dataset: DatasetSpec) -> int:
                 configurations=configurations,
             )
             print_time_intervals(intervals)
+            if args.output_dir is not None:
+                csv_path = Path(args.output_dir) / f"{dataset.name}_intervals.csv"
+                write_time_intervals_csv(intervals, csv_path)
+                print(f"Saved: {csv_path}")
             return 0
 
         output_listing = args.list or args.dry_run
@@ -325,7 +335,7 @@ def main_dataset(argv: list[str], dataset: DatasetSpec) -> int:
             client,
             dataset,
             selected,
-            args.output_dir,
+            args.output_dir if args.output_dir is not None else dataset.name,
             overwrite=args.overwrite,
         )
     except Exception as exc:  # noqa: BLE001

@@ -16,7 +16,7 @@ acquisition:
   gauge_length_m: 16.34
   channel_spacing_m: 8
   number_of_channels: 1250
-  measurement: phase
+  measurement: phase_shift
 data:
   format: SEG-Y
   size_gb: 4090.776

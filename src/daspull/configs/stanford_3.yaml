@@ -12,7 +12,7 @@ acquisition:
     model: ODH4
   start_date: '2017-10-06'
   end_date: '2017-10-12'
-  measurement: strain_rate
+  measurement: strain
   configurations:
   - sampling_rate_hz: 50
     channel_spacing_m: 8.16

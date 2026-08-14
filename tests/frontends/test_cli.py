@@ -292,10 +292,10 @@ def test_fairbanks_interval_listing_rejects_limit():
     assert exc.value.code == 2
 
 
-def test_dataset_parser_defaults_output_dir_to_the_dataset_name():
+def test_dataset_parser_leaves_output_dir_unset_by_default():
     args = build_dataset_parser(FORESEE).parse_args(["--dry-run"])
 
-    assert args.output_dir == "foresee"
+    assert args.output_dir is None
 
 
 def test_foresee_download_defaults_to_primary_hdf5_files(monkeypatch):
@@ -330,6 +330,26 @@ def test_foresee_lists_continuous_hdf5_intervals(monkeypatch, capsys):
         "2019-04-05 18:58:04    2019-04-05 19:08:04",
         "2 interval(s)",
     ]
+
+
+def test_list_intervals_with_output_dir_also_writes_a_csv(
+    monkeypatch, capsys, tmp_path
+):
+    files = [
+        RemoteFile("/FORESEE/Data/201904/FORESEE_UTC_20190404_195804.hdf5", 100),
+        RemoteFile("/FORESEE/Data/201904/FORESEE_UTC_20190404_194804.hdf5", 100),
+    ]
+    install_fake_globus_client(monkeypatch, files)
+    dest = tmp_path / "tmp"
+
+    assert main(["foresee", "--list-intervals", "-o", str(dest)]) == 0
+
+    csv_path = dest / "foresee_intervals.csv"
+    assert csv_path.read_text().splitlines() == [
+        "start_utc,end_utc",
+        "2019-04-04 19:48:04,2019-04-04 20:08:04",
+    ]
+    assert f"Saved: {csv_path}" in capsys.readouterr().out
 
 
 SGY_ROOT = "/Stanford-3-ODH4/Data/ODH4-2017-SEGY"
