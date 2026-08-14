@@ -92,7 +92,9 @@ def download(
     client = session or requests
 
     for attempt in range(2):
-        partial_size = 0 if overwrite or not tmp_path.exists() else tmp_path.stat().st_size
+        partial_size = (
+            0 if overwrite or not tmp_path.exists() else tmp_path.stat().st_size
+        )
         request_headers = dict(headers or {})
         if partial_size:
             request_headers["Range"] = f"bytes={partial_size}-"
