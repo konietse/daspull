@@ -92,7 +92,9 @@ def download(
     client = session or requests
 
     for attempt in range(2):
-        partial_size = 0 if overwrite or not tmp_path.exists() else tmp_path.stat().st_size
+        partial_size = (
+            0 if overwrite or not tmp_path.exists() else tmp_path.stat().st_size
+        )
         request_headers = dict(headers or {})
         if partial_size:
             request_headers["Range"] = f"bytes={partial_size}-"
@@ -134,7 +136,9 @@ def download(
                 partial_size = 0
 
             response_size = int(response.headers.get("content-length", 0))
-            total = response_size + partial_size if response_size else expected_size or 0
+            total = (
+                response_size + partial_size if response_size else expected_size or 0
+            )
             mode = "ab" if resumed else "wb"
             with (
                 open(tmp_path, mode) as f,
