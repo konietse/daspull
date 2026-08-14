@@ -35,6 +35,18 @@ class FakeSession:
         return self.response
 
 
+class SequenceSession:
+    """Returns one canned response per call, in order."""
+
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.calls = []
+
+    def get(self, url, **kwargs):
+        self.calls.append((url, kwargs))
+        return self.responses[len(self.calls) - 1]
+
+
 def test_download_resumes_part_file(tmp_path):
     destination = tmp_path / "sample.tdms"
     part = tmp_path / "sample.tdms.part"
@@ -57,6 +69,57 @@ def test_download_resumes_part_file(tmp_path):
     assert result == destination
     assert destination.read_bytes() == b"abcdef"
     assert session.calls[0][1]["headers"]["Range"] == "bytes=3-"
+
+
+def test_download_discards_stale_part_after_mismatched_416(tmp_path):
+    """A .part left over from before the remote file changed size can't be resumed."""
+    destination = tmp_path / "sample.tdms"
+    part = tmp_path / "sample.tdms.part"
+    part.write_bytes(b"stale-and-too-long")
+
+    session = SequenceSession(
+        [
+            FakeResponse(status_code=416, headers={"content-range": "bytes */6"}),
+            FakeResponse(b"abcdef", status_code=200, headers={"content-length": "6"}),
+        ]
+    )
+
+    result = download(
+        "https://data.example/sample.tdms",
+        destination,
+        expected_size=6,
+        session=session,
+    )
+
+    assert result == destination
+    assert destination.read_bytes() == b"abcdef"
+    assert len(session.calls) == 2
+    assert "Range" not in session.calls[1][1]["headers"]
+
+
+def test_download_retries_once_after_size_mismatch(tmp_path):
+    """A completed download that doesn't match expected_size should be discarded and retried once."""
+    destination = tmp_path / "sample.tdms"
+    part = tmp_path / "sample.tdms.part"
+
+    session = SequenceSession(
+        [
+            FakeResponse(b"short", status_code=200, headers={"content-length": "5"}),
+            FakeResponse(b"abcdef", status_code=200, headers={"content-length": "6"}),
+        ]
+    )
+
+    result = download(
+        "https://data.example/sample.tdms",
+        destination,
+        expected_size=6,
+        session=session,
+    )
+
+    assert result == destination
+    assert destination.read_bytes() == b"abcdef"
+    assert not part.exists()
+    assert len(session.calls) == 2
 
 
 def test_download_rejects_redirect_when_disabled(tmp_path):

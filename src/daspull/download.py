@@ -89,71 +89,84 @@ def download(
         )
 
     tmp_path = dest.with_suffix(dest.suffix + ".part")
-    partial_size = 0 if overwrite or not tmp_path.exists() else tmp_path.stat().st_size
-    request_headers = dict(headers or {})
-    if partial_size:
-        request_headers["Range"] = f"bytes={partial_size}-"
-
     client = session or requests
-    with client.get(
-        url,
-        stream=True,
-        timeout=timeout,
-        headers=request_headers,
-        allow_redirects=allow_redirects,
-    ) as response:
-        if not allow_redirects and 300 <= response.status_code < 400:
-            location = response.headers.get("location", "<unknown>")
-            raise DownloadRedirectError(
-                f"Download requires authentication (redirected to {location})"
+
+    for attempt in range(2):
+        partial_size = 0 if overwrite or not tmp_path.exists() else tmp_path.stat().st_size
+        request_headers = dict(headers or {})
+        if partial_size:
+            request_headers["Range"] = f"bytes={partial_size}-"
+
+        with client.get(
+            url,
+            stream=True,
+            timeout=timeout,
+            headers=request_headers,
+            allow_redirects=allow_redirects,
+        ) as response:
+            if not allow_redirects and 300 <= response.status_code < 400:
+                location = response.headers.get("location", "<unknown>")
+                raise DownloadRedirectError(
+                    f"Download requires authentication (redirected to {location})"
+                )
+
+            if response.status_code == 416 and partial_size:
+                remote_size = _range_total(response.headers.get("content-range"))
+                if remote_size == partial_size:
+                    _validate_partial(tmp_path, checksum, checksum_algo, expected_size)
+                    tmp_path.replace(dest)
+                    return dest
+                if attempt == 0:
+                    tmp_path.unlink(missing_ok=True)
+                    continue
+                response.raise_for_status()
+
+            response.raise_for_status()
+
+            resumed = partial_size > 0 and response.status_code == 206
+            if resumed:
+                content_range = response.headers.get("content-range", "")
+                if not content_range.startswith(f"bytes {partial_size}-"):
+                    raise OSError(
+                        f"Server returned an unexpected Content-Range: {content_range!r}"
+                    )
+            else:
+                partial_size = 0
+
+            response_size = int(response.headers.get("content-length", 0))
+            total = response_size + partial_size if response_size else expected_size or 0
+            mode = "ab" if resumed else "wb"
+            with (
+                open(tmp_path, mode) as f,
+                tqdm(
+                    total=total,
+                    initial=partial_size,
+                    unit="B",
+                    unit_scale=True,
+                    desc=dest.name,
+                ) as bar,
+            ):
+                for chunk in response.iter_content(chunk_size=chunk_size):
+                    if chunk:
+                        f.write(chunk)
+                        bar.update(len(chunk))
+
+        if expected_size is not None and tmp_path.stat().st_size != expected_size:
+            received = tmp_path.stat().st_size
+            if attempt == 0:
+                tmp_path.unlink(missing_ok=True)
+                continue
+            tmp_path.unlink(missing_ok=True)
+            raise OSError(
+                f"Size mismatch for {dest}: expected {expected_size} bytes, "
+                f"received {received}"
             )
 
-        if response.status_code == 416 and partial_size:
-            remote_size = _range_total(response.headers.get("content-range"))
-            if remote_size == partial_size:
-                _validate_partial(tmp_path, checksum, checksum_algo, expected_size)
-                tmp_path.replace(dest)
-                return dest
+        _validate_partial(tmp_path, checksum, checksum_algo, expected_size)
+        tmp_path.replace(dest)
+        return dest
 
-        response.raise_for_status()
-
-        resumed = partial_size > 0 and response.status_code == 206
-        if resumed:
-            content_range = response.headers.get("content-range", "")
-            if not content_range.startswith(f"bytes {partial_size}-"):
-                raise OSError(
-                    f"Server returned an unexpected Content-Range: {content_range!r}"
-                )
-        else:
-            partial_size = 0
-
-        response_size = int(response.headers.get("content-length", 0))
-        total = response_size + partial_size if response_size else expected_size or 0
-        mode = "ab" if resumed else "wb"
-        with (
-            open(tmp_path, mode) as f,
-            tqdm(
-                total=total,
-                initial=partial_size,
-                unit="B",
-                unit_scale=True,
-                desc=dest.name,
-            ) as bar,
-        ):
-            for chunk in response.iter_content(chunk_size=chunk_size):
-                if chunk:
-                    f.write(chunk)
-                    bar.update(len(chunk))
-
-    if expected_size is not None and tmp_path.stat().st_size != expected_size:
-        raise OSError(
-            f"Size mismatch for {dest}: expected {expected_size} bytes, "
-            f"received {tmp_path.stat().st_size}"
-        )
-
-    _validate_partial(tmp_path, checksum, checksum_algo, expected_size)
-    tmp_path.replace(dest)
-    return dest
+    raise AssertionError("unreachable")  # pragma: no cover
 
 
 def download_many(urls: list[str], dest_dir: str | Path, **kwargs) -> list[Path]:
