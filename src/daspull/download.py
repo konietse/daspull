@@ -159,7 +159,9 @@ def download(
                     continue
                 raise
         else:
-            partial_size = 0 if overwrite or not tmp_path.exists() else tmp_path.stat().st_size
+            partial_size = (
+                0 if overwrite or not tmp_path.exists() else tmp_path.stat().st_size
+            )
             request_headers = dict(headers or {})
             if partial_size:
                 request_headers["Range"] = f"bytes={partial_size}-"
@@ -179,9 +181,13 @@ def download(
                         )
 
                     if response.status_code == 416 and partial_size:
-                        remote_size = _range_total(response.headers.get("content-range"))
+                        remote_size = _range_total(
+                            response.headers.get("content-range")
+                        )
                         if remote_size == partial_size:
-                            _validate_partial(tmp_path, checksum, checksum_algo, expected_size)
+                            _validate_partial(
+                                tmp_path, checksum, checksum_algo, expected_size
+                            )
                             tmp_path.replace(dest)
                             return dest
                         if attempt < max_attempts - 1:
@@ -202,7 +208,11 @@ def download(
                         partial_size = 0
 
                     response_size = int(response.headers.get("content-length", 0))
-                    total = response_size + partial_size if response_size else expected_size or 0
+                    total = (
+                        response_size + partial_size
+                        if response_size
+                        else expected_size or 0
+                    )
                     mode = "ab" if resumed else "wb"
                     stall_check = _watch_for_stall(min_speed, stall_timeout)
                     received = partial_size
@@ -342,7 +352,10 @@ def _download_parallel(
                 )
 
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            futures = [pool.submit(fetch, start, end) for start, end in _split_ranges(total, workers)]
+            futures = [
+                pool.submit(fetch, start, end)
+                for start, end in _split_ranges(total, workers)
+            ]
             for future in as_completed(futures):
                 future.result()
 

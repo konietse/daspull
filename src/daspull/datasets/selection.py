@@ -208,7 +208,10 @@ def download_dataset_files(
 ) -> list[Path]:
     """Download dataset files, preserving their tree below *dest_dir*."""
     kwargs = {}
-    if max_workers is not None and "max_workers" in inspect.signature(client.download_files).parameters:
+    if (
+        max_workers is not None
+        and "max_workers" in inspect.signature(client.download_files).parameters
+    ):
         kwargs["max_workers"] = max_workers
     return client.download_files(
         files, dest_dir, root=dataset.dataset_root, overwrite=overwrite, **kwargs

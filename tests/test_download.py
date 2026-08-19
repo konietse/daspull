@@ -234,7 +234,9 @@ class RangeSession:
         start, end = kwargs["headers"]["Range"].removeprefix("bytes=").split("-")
         start, end = int(start), int(end)
         body = self.payload[start : end + 1]
-        return FakeResponse(body, status_code=206, headers={"content-length": str(len(body))})
+        return FakeResponse(
+            body, status_code=206, headers={"content-length": str(len(body))}
+        )
 
 
 def test_download_uses_parallel_ranges_for_large_files(tmp_path):
