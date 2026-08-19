@@ -17,9 +17,10 @@ from ..catalog import (
     local_relative_path,
     resolve_literal_path,
 )
-from ..download import download
+from ..download import DEFAULT_PARALLEL_THRESHOLD, download
 
 DEFAULT_TIMEOUT = (10, 120)
+DEFAULT_PARALLEL_WORKERS = 8
 _S3_NAMESPACE = "{http://s3.amazonaws.com/doc/2006-03-01/}"
 
 
@@ -113,6 +114,8 @@ class S3Client:
         dest: str | Path,
         *,
         overwrite: bool = False,
+        max_workers: int = DEFAULT_PARALLEL_WORKERS,
+        parallel_threshold: int = DEFAULT_PARALLEL_THRESHOLD,
     ) -> Path:
         """Download one catalogued file, preserving resumable partial data."""
         url = self._object_url(self._real_key(remote.path))
@@ -124,6 +127,8 @@ class S3Client:
             checksum=remote.checksum,
             checksum_algo="md5",
             session=self.session,
+            max_workers=max_workers,
+            parallel_threshold=parallel_threshold,
         )
 
     def download_files(
@@ -133,6 +138,8 @@ class S3Client:
         *,
         root: str,
         overwrite: bool = False,
+        max_workers: int = DEFAULT_PARALLEL_WORKERS,
+        parallel_threshold: int = DEFAULT_PARALLEL_THRESHOLD,
     ) -> list[Path]:
         """Download files while preserving their paths relative to *root*."""
         root = directory_path(root)
@@ -141,7 +148,13 @@ class S3Client:
         for remote in files:
             relative = local_relative_path(remote.path, root)
             results.append(
-                self.download_file(remote, destination / relative, overwrite=overwrite)
+                self.download_file(
+                    remote,
+                    destination / relative,
+                    overwrite=overwrite,
+                    max_workers=max_workers,
+                    parallel_threshold=parallel_threshold,
+                )
             )
         return results
 

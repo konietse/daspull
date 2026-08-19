@@ -1,8 +1,13 @@
+import sys
+import time
 from pathlib import Path
+from threading import Lock
 
 import pytest
 
 from daspull.download import DownloadRedirectError, download, download_many
+
+download_module = sys.modules["daspull.download"]
 
 
 class FakeResponse:
@@ -173,6 +178,82 @@ def test_destination_directory_uses_url_path_name(tmp_path):
 
     assert result.name == "sample.tdms"
     assert result.read_bytes() == b"data"
+
+
+def test_download_recovers_from_a_stalled_connection(tmp_path, monkeypatch):
+    """A connection stuck far below the speed floor is dropped and resumed
+    rather than being allowed to trickle along indefinitely."""
+    monkeypatch.setattr(download_module, "_backoff", lambda attempt: 0)
+    destination = tmp_path / "sample.tdms"
+
+    class StallingResponse(FakeResponse):
+        def iter_content(self, chunk_size):
+            yield b"a"
+            time.sleep(0.08)
+            yield b"b"
+
+    session = SequenceSession(
+        [
+            StallingResponse(status_code=200, headers={"content-length": "6"}),
+            FakeResponse(
+                b"cdef",
+                status_code=206,
+                headers={"content-length": "4", "content-range": "bytes 2-5/6"},
+            ),
+        ]
+    )
+
+    result = download(
+        "https://data.example/sample.tdms",
+        destination,
+        expected_size=6,
+        session=session,
+        stall_timeout=0.05,
+        min_speed=1_000_000,
+    )
+
+    assert result == destination
+    assert destination.read_bytes() == b"abcdef"
+    assert len(session.calls) == 2
+    # The stalled connection is dropped and resumed from where it left off,
+    # not restarted from scratch.
+    assert session.calls[1][1]["headers"]["Range"] == "bytes=2-"
+
+
+class RangeSession:
+    """Serves byte ranges of a fixed payload, regardless of which worker asks."""
+
+    def __init__(self, payload):
+        self.payload = payload
+        self.calls = []
+        self._lock = Lock()
+
+    def get(self, url, **kwargs):
+        with self._lock:
+            self.calls.append((url, kwargs))
+        start, end = kwargs["headers"]["Range"].removeprefix("bytes=").split("-")
+        start, end = int(start), int(end)
+        body = self.payload[start : end + 1]
+        return FakeResponse(body, status_code=206, headers={"content-length": str(len(body))})
+
+
+def test_download_uses_parallel_ranges_for_large_files(tmp_path):
+    payload = bytes(range(256)) * 100  # 25,600 bytes
+    destination = tmp_path / "big.h5"
+    session = RangeSession(payload)
+
+    result = download(
+        "https://data.example/big.h5",
+        destination,
+        expected_size=len(payload),
+        session=session,
+        max_workers=4,
+        parallel_threshold=1,
+    )
+
+    assert result == destination
+    assert destination.read_bytes() == payload
+    assert len(session.calls) == 4
 
 
 def test_download_many_creates_destination_directory(tmp_path):

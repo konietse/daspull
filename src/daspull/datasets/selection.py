@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from datetime import datetime
 from functools import partial
@@ -203,8 +204,12 @@ def download_dataset_files(
     dest_dir: str | Path,
     *,
     overwrite: bool = False,
+    max_workers: int | None = None,
 ) -> list[Path]:
     """Download dataset files, preserving their tree below *dest_dir*."""
+    kwargs = {}
+    if max_workers is not None and "max_workers" in inspect.signature(client.download_files).parameters:
+        kwargs["max_workers"] = max_workers
     return client.download_files(
-        files, dest_dir, root=dataset.dataset_root, overwrite=overwrite
+        files, dest_dir, root=dataset.dataset_root, overwrite=overwrite, **kwargs
     )

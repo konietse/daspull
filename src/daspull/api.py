@@ -202,6 +202,7 @@ class Dataset:
         channel_spacing: float | None = None,
         gauge_length: float | None = None,
         overwrite: bool = False,
+        max_workers: int | None = None,
     ) -> list[Path]:
         """Download the selected files, preserving their tree below *out*.
 
@@ -260,6 +261,7 @@ class Dataset:
             selected,
             self.name if out is None else out,
             overwrite=overwrite,
+            max_workers=max_workers,
         )
 
     def __repr__(self) -> str:
